@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Engine - By Raihanstruggle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-jakarta">
+    <!-- FLOATING DECORATIONS -->
+    <div class="floating-decorations">
+        <div class="floating-blob blob-1"></div>
+        <div class="floating-blob blob-2"></div>
+        <div class="floating-blob blob-3"></div>
+        <div class="floating-blob blob-4"></div>
+    </div>
+    <!-- HEADER -->
+    <header class="bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-slate-900 font-outfit font-bold text-lg leading-tight">Script Engine</h1>
+                    <p class="text-slate-400 text-xs">By Raihanstruggle</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span class="text-sm font-semibold">Keluar</span>
+            </button>
+        </div>
+    </header>
+    <!-- PROGRESS BAR -->
+    <div class="progress-bar-container" id="progressBarContainer">
+        <div class="progress-bar-wrapper">
+            <div class="progress-steps">
+                <!-- Garis Background -->
+                <div class="progress-line-bg"></div>
+                <!-- Garis Aktif -->
+                <div class="progress-line-active" id="progressLineActive" style="width: 0%;"></div>
+                
+                <!-- Step 1 -->
+                <div class="progress-step" data-step="1">
+                    <div class="progress-dot" id="progress-dot-1">1</div>
+                    <span class="progress-label">Konteks</span>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="progress-step" data-step="2">
+                    <div class="progress-dot" id="progress-dot-2">2</div>
+                    <span class="progress-label">Spesifikasi</span>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="progress-step" data-step="3">
+                    <div class="progress-dot" id="progress-dot-3">3</div>
+                    <span class="progress-label">Strategi</span>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="progress-step" data-step="4">
+                    <div class="progress-dot" id="progress-dot-4">4</div>
+                    <span class="progress-label">Audience</span>
+                </div>
+                
+                <!-- Step 5 -->
+                <div class="progress-step" data-step="5">
+                    <div class="progress-dot" id="progress-dot-5">5</div>
+                    <span class="progress-label">Detail</span>
+                </div>
+                
+                <!-- Step 6 -->
+                <div class="progress-step" data-step="6">
+                    <div class="progress-dot" id="progress-dot-6">6</div>
+                    <span class="progress-label">Output</span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- MAIN CONTENT -->
+            <main class="max-w-7xl mx-auto px-6 py-12 relative z-10">
+            
+            <!-- HERO SECTION (Full Width - Dipindah ke luar wrapper) -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 border border-emerald-100">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    AI Content Script Generator
+                </div>
+                <h2 class="font-outfit text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
+                    Bikin Script Konten<br><span class="text-emerald-500">Sekali Klik</span>
+                </h2>
+                <p class="text-slate-500 text-lg max-w-xl mx-auto leading-relaxed">
+                    Dari struktur hook sampai CTA, semua dibantu tools ini.
+                </p>
+            </div>
+
+            <!-- Wrapper untuk 2 Kolom -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- KOLOM KIRI: FORM INPUT (Lebar 2/3) -->
+                <div class="w-full lg:w-2/3 space-y-8">
+
+                <!-- SECTION 1: MASTER FILTER -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="section-number">1</div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xl font-bold text-slate-900">Konteks & Platform</h3>
+                                <div class="tooltip-container">
+                                    <span class="tooltip-icon">?</span>
+                                    <div class="tooltip-box">
+                                        "Konteks adalah fondasi utama. Bagian ini membantu AI memahami arah kompas konten lu—siapa yang ngomong, di mana konten tayang, dan apa hasil akhir yang diharapkan."
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-400">Tentukan fondasi kontenmu terlebih dahulu</p>
+                        </div>
+                    </div>
+
+                    <p class="text-sm font-semibold text-slate-600 mb-4">Apa fokus utama konten Anda?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+                        <div onclick="selectMasterFilter('jualan')" id="card-jualan" class="card-option cursor-pointer p-6 bg-white border-2 border-slate-200 rounded-2xl hover:border-emerald-400 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-100 group">
+                            <div class="text-4xl mb-3">🛒</div>
+                            <h4 class="font-bold text-lg text-slate-900 mb-1">Jualan Produk / Affiliate / Jasa</h4>
+                            <p class="text-sm text-slate-400">Fokus:convert penonton jadi pembeli.</p>
+                        </div>
+                        <div onclick="selectMasterFilter('edukasi')" id="card-edukasi" class="card-option cursor-pointer p-6 bg-white border-2 border-slate-200 rounded-2xl hover:border-emerald-400 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-100 group">
+                            <div class="text-4xl mb-3">💡</div>
+                            <h4 class="font-bold text-lg text-slate-900 mb-1">Edukasi / Branding (Tanpa Jualan)</h4>
+                            <p class="text-sm text-slate-400">Fokus: engagement, authority, dan trust.</p>
+                        </div>
+                    </div>
+
+                    <!-- CONTAINER DINAMIS 1 -->
+                    <div id="dynamicFormContainer" class="border-t border-slate-100 pt-8">
+                        <!-- Form dinamis akan muncul di sini -->
+                    </div>
+                </div>
+
+                <!-- SECTION 2 (Tanpa Hidden) -->
+                <div id="section2Container" class="max-w-4xl mx-auto">
+                    <!-- Konten Section 2 -->
+                </div>
+
+                <!-- SECTION 3 (Tanpa Hidden) -->
+                <div id="section3Container" class="max-w-4xl mx-auto">
+                    <!-- Konten Section 3 -->
+                </div>
+
+                <!-- SECTION 4 (Tanpa Hidden) -->
+                <div id="section4Container" class="max-w-4xl mx-auto">
+                    <!-- Konten Section 4 -->
+                </div>
+
+                <!-- SECTION 5 (Tanpa Hidden) -->
+                <div id="section5Container" class="max-w-4xl mx-auto">
+                    <!-- Konten Section 5 -->
+                </div>
+
+                <!-- SECTION 6 (Tanpa Hidden) -->
+                <div id="section6Container" class="max-w-4xl mx-auto">
+                    <!-- Konten Section 6 -->
+                </div>
+
+                <!-- TOMBOL ACTION (Tanpa Hidden) -->
+                <div id="finalActionContainer" class="max-w-4xl mx-auto">
+                    <!-- Tombol akan di-render oleh JS di sini -->
+                </div>
+            
+            </div> <!-- End Kolom Kiri -->
+
+            <!-- KOLOM KANAN: PREVIEW (Lebar 1/3) -->
+            <div class="w-full lg:w-1/3">
+                <div class="sticky top-24 self-start">
+                    <div id="previewContainer">                 
+                        <!-- Konten Preview Awal -->
+                        <div class="text-center text-slate-400 pt-20">
+                            <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="font-bold text-lg text-slate-300">Preview Prompt</h3>
+                            <p class="text-sm mt-2">Hasil prompt akan muncul di sini secara real-time saat Anda mengisi form.</p>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End Kolom Kanan -->
+
+        </div> <!-- End Wrapper -->
+
+    </main>
+
+    <script src="script.js"></script>
+
+    <!-- Container untuk Modal Info (Section 3) -->
+    <div id="infoModal" class="info-modal-overlay" onclick="closeInfoModal(event)">
+        <div class="info-modal-box" onclick="event.stopPropagation()">
+            <div class="info-modal-header">
+                <div class="info-modal-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span id="infoModalTitleText">Informasi</span>
+                </div>
+                <button class="info-modal-close" onclick="closeInfoModal(event)">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="info-modal-body" id="infoModalContent">
+                <!-- Konten akan diisi oleh JS -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
