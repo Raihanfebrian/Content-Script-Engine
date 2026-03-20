@@ -1455,7 +1455,7 @@ function updatePreview() {
     // Jalankan animasi mengetik
     const promptArea = document.getElementById('prompt-text-area');
     if(promptArea) {
-        typeWriter(promptText, promptArea, 5); // 5ms delay per karakter (cepat)
+        typeWriter(promptText, promptArea, 0); // 0ms delay, chunk 5 karakter (super cepat)
     }
 }
 
@@ -1471,15 +1471,23 @@ function typeWriter(text, element, delay = 1) {
     cursor.className = 'cursor-blink';
     element.appendChild(cursor);
 
-    // Dapatkan container parent untuk scroll
+    // Dapatkan container parent untuk Scroll
     const scrollContainer = element.closest('.prompt-body-container');
+    
+    // KONFIGURASI KECEPATAN: 5 karakter per putaran (5x lebih cepat)
+    const chunkSize = 5; 
 
     function type() {
         if (i < text.length) {
-            // Sisipkan karakter sebelum cursor
-            const char = document.createTextNode(text.charAt(i));
-            element.insertBefore(char, cursor);
-            i++;
+            // Ambil potongan teks (chunk) sesuai ukuran
+            const end = Math.min(i + chunkSize, text.length);
+            const chunk = document.createTextNode(text.slice(i, end));
+            
+            // Sisipkan chunk sebelum cursor
+            element.insertBefore(chunk, cursor);
+            
+            // Update index
+            i = end;
             
             // Auto scroll ke bawah mengikuti teks baru
             if (scrollContainer) {
@@ -1711,72 +1719,80 @@ function generatePrompt() {
     p += `3. CONTOH SALAH vs BENAR:\n`;
     p += `   - SALAH: "Penting untuk memperhatikan asupan gizi Anda."\n`;
     p += `   - BENAR: "Cek lagi deh, makan lo udah bener belum." (Sesuaikan dengan Pronoun Rules).\n`;
-    
-    if (isFaceless) p += `4. FACELESS: Dilarang instruksi senyum/gesture wajah. Fokus ke visual layar/B-Roll/Text Overlay.\n`;
-    if (!isComplianceAman && s.compliance) p += `5. COMPLIANCE (${s.compliance}): Dilarang overclaim (klaim berlebihan). Gunakan bahasa aman (membantu, mendukung, dsb).\n`;
-    if (s.targetKeyword) p += `6. SEO: Selipkan natural keyword "${s.targetKeyword}" di caption atau narasi.\n`;
-    if (s.asetVisual) p += `7. ASET: Sesuaikan adegan dengan aset yang tersedia: "${s.asetVisual}".\n\n`;
+    p += `4. FORMAT TABEL:\n`;
+    p += `   - DILARANG menggunakan karakter newline (\n) di dalam sel tabel.\n`;
+    p += `   - Jika perlu ganti paragraf dalam 1 sel, gunakan tag HTML <br>.\n`;
+    p += `   - Tulis naskah dalam satu paragraf utuh per section.\n`;
+
+    if (isFaceless) p += `5. FACELESS: Dilarang instruksi senyum/gesture wajah. Fokus ke visual layar/B-Roll/Text Overlay.\n`;
+    if (!isComplianceAman && s.compliance) p += `6. COMPLIANCE (${s.compliance}): Dilarang overclaim (klaim berlebihan). Gunakan bahasa aman (membantu, mendukung, dsb).\n`;
+    if (s.targetKeyword) p += `7. SEO: Selipkan natural keyword "${s.targetKeyword}" di caption atau narasi.\n`;
+    if (s.asetVisual) p += `8. ASET: Sesuaikan adegan dengan aset yang tersedia: "${s.asetVisual}".\n\n`;
 
     // ========================================
-    // 8. FORMAT OUTPUT DINAMIS
+    // 8. FORMAT OUTPUT DINAMIS (TABLE BASED)
     // ========================================
-    p += `[5. FORMAT OUTPUT]\n`;
+    p += `[5. FORMAT OUTPUT - WAJIB GUNAKAN TABEL]\n`;
+    p += `Sajikan output dalam format TABEL MARKDOWN yang rapih agar mudah dibaca dan di-copy.\n\n`;
 
     if (isCarousel) {
         // ===== FORMAT CAROUSEL/SLIDES =====
-        p += `Konten berbentuk CAROUSEL/SLIDES. Gunakan format ini:\n\n`;
+        p += `Konten berbentuk CAROUSEL/SLIDES. Gunakan format TABEL berikut:\n\n`;
         p += `**Variasi [No]: [Judul Angle]**\n`;
-        p += `*Hook: [Sebutkan taktik hook yang dipilih]*\n\n`;
-        p += `[SLIDE 1 - COVER]\n`;
-        p += `(Visual): [Deskripsi gambar/ilustrasi cover]\n`;
-        p += `(Teks): "[Headline utama yang menarik]"\n\n`;
-        p += `[SLIDE 2-N - ISI]\n`;
-        p += `(Visual): [Deskripsi gambar per slide]\n`;
-        p += `(Teks): "[Poin/value per slide - singkat! Max 20 kata]"\n\n`;
-        p += `[SLIDE AKHIR - CTA]\n`;
-        p += `(Visual): [Deskripsi gambar CTA]\n`;
-        p += `(Teks): "[Ajakan action yang jelas]"\n\n`;
-        p += `Caption: [Copywriting singkat] | Hashtag: [3-5 hashtag]\n`;
+        p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
+        p += `| Slide | Visual (Deskripsi Gambar/Desain) | Teks Overlay (Copy di Gambar) |\n`;
+        p += `|:---:|---|---|\n`;
+        p += `| 1 (Cover) | [Deskripsi visual cover yang menarik perhatian] | "[Headline utama yang bikin penasaran]" |\n`;
+        p += `| 2 s/d N (Isi) | [Deskripsi visual per slide, jaga konsistensi warna/font] | "[Poin/value per slide - SINGKAT! Max 20 kata]" |\n`;
+        p += `| Akhir (CTA) | [Deskripsi visual slide penutup dengan arrow/cta button] | "[Ajakan action yang jelas: Follow, Save, Link Bio]" |\n\n`;
+        p += `**Caption:** [Copywriting singkat]\n`;
+        p += `**Hashtag:** [3-5 hashtag relevant]\n`;
         p += `----------------------------------\n`;
 
     } else if (isThread) {
         // ===== FORMAT TWITTER/X THREAD =====
-        p += `Konten berbentuk THREAD. Gunakan format ini:\n\n`;
+        p += `Konten berbentuk THREAD. Gunakan format TABEL berikut:\n\n`;
         p += `**Variasi [No]: [Judul Thread]**\n`;
-        p += `*Hook: [Sebutkan taktik hook yang dipilih]*\n\n`;
-        p += `[TWEET 1 - HOOK]\n`;
-        p += `"[Kalimat pembuka powerful - max 280 char]"\n\n`;
-        p += `[TWEET 2-N - ISI]\n`;
-        p += `"[1 poin per tweet - max 280 char]"\n\n`;
-        p += `[TWEET AKHIR - CTA]\n`;
-        p += `"[Summary + Ajakan action]"\n\n`;
+        p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
+        p += `| Tweet No | Konten Tweet (Max 280 Karakter) |\n`;
+        p += `|:---:|---|\n`;
+        p += `| 1 (Hook) | "[Kalimat pembuka powerful yang bikin orang stop scroll]" |\n`;
+        p += `| 2 s/d N (Isi) | "[1 poin per tweet, jangan gabung banyak ide dalam 1 tweet]" |\n`;
+        p += `| Akhir (CTA) | "[Summary singkat + Ajakan action: RT, Reply, Follow]" |\n\n`;
         p += `----------------------------------\n`;
 
     } else if (isStaticImage) {
         // ===== FORMAT SINGLE IMAGE =====
-        p += `Konten berbentuk IMAGE + CAPTION. Gunakan format ini:\n\n`;
+        p += `Konten berbentuk IMAGE + CAPTION. Gunakan format TABEL berikut:\n\n`;
         p += `**Variasi [No]: [Judul]**\n`;
-        p += `*Hook: [Taktik visual hook]*\n\n`;
-        p += `[IMAGE]\n`;
-        p += `(Visual): [Deskripsi foto/gambar utama]\n`;
-        p += `(Teks Overlay): "[Text yang ada di gambar]"\n\n`;
-        p += `[CAPTION PANJANG]\n`;
-        p += `"[Caption dengan hook + value + CTA - bisa 300+ kata]"\n\n`;
-        p += `Hashtag: [5-10 hashtag relevant]\n`;
+        p += `*Hook Strategy: [Taktik visual hook]*\n\n`;
+        p += `| Elemen | Detail |\n`;
+        p += `|---|---|\n`;
+        p += `| **Visual Utama** | [Deskripsi foto/gambar utama: objek, angle, lighting, mood] |\n`;
+        p += `| **Teks Overlay** | "[Text yang ada di gambar - harus eye-catching & readable]" |\n`;
+        p += `| **Caption** | "[Caption panjang dengan hook + value + CTA - bisa 300+ kata]" |\n`;
+        p += `| **Hashtag** | [5-10 hashtag relevant dipisahkan spasi] |\n`;
         p += `----------------------------------\n`;
-
+   
     } else {
         // ===== FORMAT VIDEO (DEFAULT) =====
-        p += `Konten berbentuk VIDEO. Gunakan format ini:\n\n`;
+        p += `Konten berbentuk VIDEO. Gunakan format TABEL berikut:\n\n`;
         p += `**Variasi [No]: [Judul Angle]**\n`;
-        p += `*Hook: [Sebutkan taktik hook yang dipilih]*\n\n`;
-        p += `[HOOK - 3 detik pertama]\n`;
-        p += `(Visual): [Deskripsi adegan pembuka]\n`;
-        p += `(Audio): "[Naskah spoken-word hook - harus stop scroll!]"\n\n`;
-        p += `[BODY & CTA]\n`;
-        p += `(Visual): [Deskripsi adegan isi]\n`;
-        p += `(Audio): "[Naskah spoken-word isi + CTA]"\n\n`;
-        p += `Caption: [Copywriting singkat] | Hashtag: [3-5 hashtag]\n`;
+        p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
+        p += `| Section | Visual (Adegan/Gerakan Kamera) | Audio (Naskah Spoken-Word) | Durasi Est. |\n`;
+        p += `|---|---|---|:---:|\n`;
+        p += `| **HOOK** | [Deskripsi detail adegan pembuka yang menarik] | "[Naskah hook - langsung ke poin, harus stop scroll!]" | 3-5 detik |\n`;
+        p += `| **[STEP 1 FW]** | [Visual step 1 sesuai framework] | "[Naskah step 1 - SESUAIKAN DENGAN INSTRUKSI FRAMEWORK]" | Sesuaikan |\n`;
+        p += `| **[STEP 2 FW]** | [Visual step 2 sesuai framework] | "[Naskah step 2 - SESUAIKAN DENGAN INSTRUKSI FRAMEWORK]" | Sesuaikan |\n`;
+        p += `| **[STEP N FW]** | [Visual step selanjutnya jika ada] | "[Naskah step selanjutnya]" | Sesuaikan |\n`;
+        p += `| **CTA** | [Deskripsi adegan penutup/gesture menunjuk link/arah] | "[Naskah CTA - ajakan action jelas & tegas]" | 5 detik |\n\n`;
+        p += `**CATATAN PENTING:**\n`;
+        p += `- JANGAN gunakan baris "BODY" generik.\n`;
+        p += `- Ganti "[STEP 1 FW]", "[STEP 2 FW]", dst dengan NAMA LANGKAH dari FRAMEWORK yang dipilih.\n`;
+        p += `- Contoh: Kalau framework ABT, barisnya harus: FACT, BUT, THEREFORE.\n`;
+        p += `- Contoh: Kalau framework PAS, barisnya harus: PROBLEM, AGITATE, SOLUTION.\n\n`;
+        p += `**Caption:** [Copywriting singkat untuk deskripsi video]\n`;
+        p += `**Hashtag:** [3-5 hashtag relevant]\n`;
         p += `----------------------------------\n`;
     }
 
