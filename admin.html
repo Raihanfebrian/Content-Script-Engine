@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tool - Script Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .toast-notification {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; padding: 14px 24px; border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            font-size: 14px; font-weight: 600; z-index: 9999; opacity: 0;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 10px;
+            pointer-events: none;
+        }
+        .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <!-- HALAMAN LOGIN -->
+    <div id="loginPage" class="w-full max-w-md bg-white rounded-2xl p-8 border border-emerald-200 shadow-xl hidden">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <span class="text-3xl">🔒</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Admin Panel</h1>
+            <p class="text-slate-500 text-sm">Script Engine - By Raihanstruggle</p>
+        </div>
+        
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">Email Admin</label>
+                <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition" placeholder="admin@email.com" required>
+            </div>
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">Password</label>
+                <input type="password" id="loginPass" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="w-full py-3 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">🔐 Masuk</button>
+        </form>
+        <p id="loginError" class="text-red-500 text-sm text-center mt-4 hidden">Email atau password salah!</p>
+        <p id="loginDenied" class="text-yellow-600 text-sm text-center mt-4 hidden">⚠️ Akses ditolak! Hanya admin yang diizinkan.</p>
+    </div>
+
+    <!-- HALAMAN ADMIN TOOL -->
+    <div id="adminPage" class="w-full max-w-md bg-white rounded-2xl p-8 border border-emerald-200 shadow-xl hidden">
+        <div class="flex justify-between items-center mb-2">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">📝 Admin Tool</h1>
+                <p class="text-slate-500 text-sm">Script Engine</p>
+            </div>
+            <button onclick="logout()" class="px-3 py-1 bg-red-50 text-red-500 text-xs font-semibold rounded-lg hover:bg-red-500 hover:text-white transition border border-red-200 hover:border-red-500">Logout</button>
+        </div>
+        <div class="mb-6"></div>
+        
+        <div class="mb-4">
+            <label class="block text-slate-700 text-sm mb-1 font-semibold">Email Pembeli</label>
+            <input type="email" id="checkEmail" onkeypress="handleEnter(event)" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition" placeholder="email@pembeli.com">
+        </div>
+        
+        <button type="button" onclick="checkUser()" id="checkBtn" class="w-full py-3 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600 shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 mb-4">🔍 CEK STATUS USER</button>
+        
+        <div id="userStatus" class="hidden mb-4">
+            <div class="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
+                <p class="text-slate-900 font-semibold mb-2">📋 Status User:</p>
+                <div id="statusContent"></div>
+            </div>
+        </div>
+        
+        <form id="createForm" class="space-y-4 hidden">
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">Nama Pembeli</label>
+                <input type="text" id="name" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition" required>
+            </div>
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">No. WhatsApp</label>
+                <input type="text" id="phone" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition" placeholder="08123456789">
+            </div>
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">Paket</label>
+                <select id="plan" class="w-full px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:outline-none transition">
+                    <option value="lifetime">Lifetime (Garansi 1 Tahun)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-slate-700 text-sm mb-1 font-semibold">Password <span id="passwordLabel" class="text-slate-400 font-normal">(Wajib)</span></label>
+                <div class="flex gap-2">
+                    <input type="text" id="password" class="flex-1 px-4 py-3 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none transition">
+                    <button type="button" onclick="generatePassword()" class="px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">🔄</button>
+                </div>
+                <p class="text-slate-400 text-xs mt-1" id="passwordHint">Kirim password ini ke pembeli</p>
+            </div>
+            <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-lg hover:opacity-90 shadow-lg transition transform hover:-translate-y-0.5">🚀 CREATE / UPDATE USER</button>
+        </form>
+        
+        <!-- Success -->
+        <div id="successBox" class="hidden mt-4">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <p class="text-emerald-700 font-bold text-lg mb-2" id="successTitle"></p>
+                <p class="text-slate-700 text-sm" id="successDetail"></p>
+                
+                <div class="mt-4 bg-white rounded-lg p-3 border border-slate-200 shadow-sm">
+                    <p class="text-slate-500 text-xs mb-2">📋 Template untuk WhatsApp:</p>
+                    <p class="text-slate-800 text-sm whitespace-pre-line" id="waTemplate"></p>
+                </div>
+                
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    <button type="button" onclick="copyTemplate()" class="py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold text-sm transition">📋 Copy</button>
+                    <a id="waLinkBtn" href="#" target="_blank" class="py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 font-semibold text-center block transition text-sm shadow-md">🚀 Kirim</a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="errorBox" class="hidden mt-4">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-red-600 font-semibold">❌ Error!</p>
+                <p class="text-slate-600 text-sm mt-1" id="errorMsg"></p>
+            </div>
+        </div>
+        
+        <button type="button" onclick="resetAll()" class="mt-4 w-full py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition text-sm font-semibold">🔄 Reset Form</button>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script>
+        // ================== KONFIGURASI ADMIN ==================
+        const ADMIN_EMAIL = "raihanfebrian379@gmail.com"; 
+        // ======================================================
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKPEJTs8RB3YSK5R-AngvEvDhrxiKWK_g",
+            authDomain: "content-script-engine.firebaseapp.com",
+            projectId: "content-script-engine",
+            storageBucket: "content-script-engine.firebasestorage.app",
+            messagingSenderId: "1042569909734",
+            appId: "1:1042569909734:web:99ee83ba202c77ea937227",
+            measurementId: "G-HPSNGQ0W3M"
+        };
+        
+        // Inisialisasi Aplikasi Utama (Untuk Admin)
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        // Inisialisasi Aplikasi Kedua (Untuk Membuat User Baru -> Agar Admin tidak logout)
+        const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+        const secondaryAuth = secondaryApp.auth();
+        
+        // ============ AUTH STATE + ADMIN CHECK ============
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === ADMIN_EMAIL) {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('adminPage').classList.remove('hidden');
+                    document.getElementById('loginDenied').classList.add('hidden');
+                    document.getElementById('loginError').classList.add('hidden');
+                } else {
+                    auth.signOut();
+                    document.getElementById('loginPage').classList.remove('hidden');
+                    document.getElementById('adminPage').classList.add('hidden');
+                    document.getElementById('loginDenied').classList.remove('hidden');
+                    document.getElementById('loginError').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('adminPage').classList.add('hidden');
+            }
+        });
+
+        // ============ LOGIN LOGIC ============
+        document.getElementById('loginForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('loginDenied').classList.add('hidden');
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (err) {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function logout() { auth.signOut(); }
+
+        // ============ HELPER FUNCTIONS ============
+        let existingDoc = null;
+        let actionType = 'create';
+        let authUserExists = false;
+        
+        function handleEnter(e) { if (e.key === 'Enter') checkUser(); }
+        
+        function generatePassword() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let p = '';
+            for (let i = 0; i < 8; i++) p += chars[Math.floor(Math.random() * chars.length)];
+            document.getElementById('password').value = p;
+        }
+        
+        function calcExpiry(plan, fromDate) {
+            const d = fromDate ? new Date(fromDate) : new Date();
+            d.setFullYear(d.getFullYear() + 1); 
+            return firebase.firestore.Timestamp.fromDate(d);
+        }
+        
+        function hideAll() {
+            document.getElementById('userStatus').classList.add('hidden');
+            document.getElementById('createForm').classList.add('hidden');
+            document.getElementById('successBox').classList.add('hidden');
+            document.getElementById('errorBox').classList.add('hidden');
+        }
+        
+        function resetAll() {
+            document.getElementById('checkEmail').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('password').value = '';
+            hideAll();
+            existingDoc = null;
+            actionType = 'create';
+            authUserExists = false;
+        }
+        
+        async function checkUser() {
+            const email = document.getElementById('checkEmail').value.trim();
+            if (!email) return alert('Masukkan email!');
+            const btn = document.getElementById('checkBtn');
+            btn.disabled = true; btn.textContent = '⏳ Mengecek...'; hideAll();
+            
+            try {
+                const snap = await db.collection('subscriptions').where('email', '==', email).limit(10).get();
+                
+                authUserExists = false;
+                try { 
+                    const methods = await auth.fetchSignInMethodsForEmail(email);
+                    if (methods.length > 0) authUserExists = true; 
+                } catch (e) {}
+                
+                const passLabel = document.getElementById('passwordLabel');
+                const passHint = document.getElementById('passwordHint');
+                
+                if (snap.empty) {
+                    existingDoc = null; 
+                    actionType = 'create';
+                    generatePassword();
+                    passLabel.textContent = '(Wajib)';
+                    passHint.textContent = 'Kirim password ini ke pembeli';
+                    
+                    if (authUserExists) {
+                        document.getElementById('statusContent').innerHTML = '<p class="text-orange-500 font-semibold">⚠️ ZOMBIE ACCOUNT</p><p class="text-slate-500 text-xs">Data Auth ada tapi Firestore hilang. Akan diperbaiki.</p>';
+                    } else {
+                        document.getElementById('statusContent').innerHTML = '<p class="text-yellow-600 font-semibold">⚠️ Email belum terdaftar</p>';
+                    }
+                    
+                    document.getElementById('userStatus').classList.remove('hidden');
+                    document.getElementById('createForm').classList.remove('hidden');
+                } else {
+                    let active = null; snap.forEach(doc => { if(doc.data().isActive) active = doc; });
+                    existingDoc = active || snap.docs[0];
+                    actionType = active ? 'extend' : 'reactivate';
+                    const data = existingDoc.data();
+                    
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    document.getElementById('password').value = '';
+                    
+                    if (active) {
+                        passLabel.textContent = '(Opsional)';
+                        passHint.textContent = 'Kosongkan untuk pakai password lama';
+                    } else {
+                        generatePassword();
+                        passLabel.textContent = '(Wajib - Reset Password)';
+                        passHint.textContent = 'Password baru untuk reaktivasi';
+                    }
+                    
+                    document.getElementById('statusContent').innerHTML = `<p class="text-slate-800"><strong>Nama:</strong> ${data.name||'-'}</p><p class="text-slate-800"><strong>Status:</strong> ${active ? '<span class="text-emerald-600 font-bold">AKTIF</span>' : '<span class="text-red-500 font-bold">NON-AKTIF</span>'}</p>`;
+                    document.getElementById('userStatus').classList.remove('hidden');
+                    document.getElementById('createForm').classList.remove('hidden');
+                }
+            } catch (err) {
+                document.getElementById('errorBox').classList.remove('hidden');
+                document.getElementById('errorMsg').textContent = err.message;
+            }
+            btn.disabled = false; btn.textContent = '🔍 CEK STATUS USER';
+        }
+        
+        document.getElementById('createForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('checkEmail').value.trim();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const pass = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.textContent = '⏳ Processing...';
+            
+            document.getElementById('successBox').classList.add('hidden');
+            document.getElementById('errorBox').classList.add('hidden');
+            
+            try {
+                let finalPassword = pass || '[PASSWORD LAMA]';
+                
+                // 1. SIMPAN DATA KE FIRESTORE
+                if (actionType === 'create') {
+                    await db.collection('subscriptions').add({
+                        email, name, phone, plan: 'lifetime', 
+                        isActive: true, 
+                        expiryDate: calcExpiry('lifetime', null), 
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    await existingDoc.ref.update({
+                        name, phone, plan: 'lifetime', 
+                        isActive: true, 
+                        expiryDate: calcExpiry('lifetime', null)
+                    });
+                }
+                
+                // 2. BUAT AKUN AUTH (PAKE SECONDARY APP)
+                if (pass) {
+                    if (!authUserExists) {
+                        try {
+                            await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+                            await secondaryAuth.signOut(); 
+                        } catch (authErr) {
+                            console.warn("Auth creation skipped or failed:", authErr.message);
+                        }
+                    }
+                }
+                
+                // 3. TAMPILKAN HASIL
+                const titles = { 'create': '✅ User Dibuat!', 'extend': '✅ Diperpanjang!', 'reactivate': '✅ Diaktifkan!' };
+                document.getElementById('successTitle').textContent = titles[actionType];
+                document.getElementById('successDetail').innerHTML = 'Email: <strong>' + email + '</strong><br>Paket: <strong>Lifetime</strong>';
+                
+                // TEMPLATE WHATSAPP
+                let t = `Yeay! 🎉 Akun Script Engine Kamu Sudah Siap!
+
+Halo Kak ${name}! 🙌
+Terima kasih sudah menunggu. Akses akun kamu sudah siap dan bisa langsung digunakan untuk bikin script konten.
+
+🔑 *Detail Login:*
+Email: ${email}
+Password: ${finalPassword.includes('[PASSWORD LAMA') ? '(Gunakan password lama)' : finalPassword}
+
+👉 *Link Akses:*
+https://script.raihanstruggle.id/
+
+⚠️ *Penting:*
+1. Segera ganti password kamu setelah login pertama kali biar aman.
+2. Jangan sebarkan data login ini ke siapa pun ya!
+3. Kalau ada kendala teknis, langsung chat admin aja.
+
+Selamat bikin script konten yang gacor! 🚀🎬
+
+Salam,
+Raihan Struggle 💪`;
+                document.getElementById('waTemplate').textContent = t;
+                
+                const waBtn = document.getElementById('waLinkBtn');
+                let cleanPhone = phone.replace(/\D/g, '');
+                if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.substring(1);
+                
+                if (cleanPhone && cleanPhone.length > 5) {
+                    waBtn.href = `https://wa.me/${cleanPhone}`;
+                    waBtn.classList.remove('opacity-50', 'pointer-events-none');
+                } else {
+                    waBtn.href = "#";
+                    waBtn.classList.add('opacity-50', 'pointer-events-none');
+                }
+                
+                document.getElementById('successBox').classList.remove('hidden');
+                
+                // AUTO SCROLL KE SUCCESS BOX
+                document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            } catch (err) {
+                document.getElementById('errorBox').classList.remove('hidden');
+                document.getElementById('errorMsg').textContent = err.message;
+            }
+            
+            btn.disabled = false; 
+            btn.textContent = '🚀 CREATE / UPDATE USER';
+        });
+        
+        function showToast(msg) {
+            const old = document.querySelector('.toast-notification');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<svg style="width:20px;height:20px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2000);
+        }
+
+        function copyTemplate() {
+            navigator.clipboard.writeText(document.getElementById('waTemplate').textContent)
+                .then(() => showToast('Berhasil disalin!'))
+                .catch(err => console.error('Failed:', err));
+        }
+    </script>
+</body>
+</html>
