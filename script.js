@@ -2501,6 +2501,110 @@ function showToast(type, title, message, duration = 4000) {
 }
 
 // ========================================
+// GANTI PASSWORD
+// ========================================
+function openChangePasswordModal() {
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Reset form
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+    document.getElementById('changePassError').style.display = 'none';
+    document.getElementById('changePassBtn').disabled = false;
+    document.getElementById('changePassBtn').textContent = 'Ubah Password';
+}
+
+function closeChangePasswordModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+async function executeChangePassword() {
+    const oldPass = document.getElementById('oldPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmNewPassword').value;
+    const errorBox = document.getElementById('changePassError');
+    const errorText = document.getElementById('changePassErrorText');
+    const btn = document.getElementById('changePassBtn');
+    
+    // Reset error
+    errorBox.style.display = 'none';
+    
+    // Validasi
+    if (!oldPass || !newPass || !confirmPass) {
+        errorBox.style.display = 'flex';
+        errorText.textContent = 'Semua field wajib diisi.';
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        errorBox.style.display = 'flex';
+        errorText.textContent = 'Password baru minimal 6 karakter.';
+        return;
+    }
+    
+    if (newPass !== confirmPass) {
+        errorBox.style.display = 'flex';
+        errorText.textContent = 'Konfirmasi password tidak cocok.';
+        return;
+    }
+    
+    if (oldPass === newPass) {
+        errorBox.style.display = 'flex';
+        errorText.textContent = 'Password baru tidak boleh sama dengan password lama.';
+        return;
+    }
+    
+    // Loading state
+    btn.disabled = true;
+    btn.textContent = 'Mengubah...';
+    
+    const user = firebase.auth().currentUser;
+    const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+    
+    try {
+        // 1. Re-authenticate dulu dengan password lama
+        await user.reauthenticateWithCredential(credential);
+        
+        // 2. Update password
+        await user.updatePassword(newPass);
+        
+        // 3. Success - tutup modal
+        closeChangePasswordModal({ target: document.getElementById('changePasswordModal') });
+        showToast('success', 'Password Berhasil Diubah', 'Password akun kamu sudah diperbarui.');
+        
+    } catch (err) {
+        errorBox.style.display = 'flex';
+        
+        switch (err.code) {
+            case 'auth/wrong-password':
+                errorText.textContent = 'Password lama salah.';
+                break;
+            case 'auth/too-many-requests':
+                errorText.textContent = 'Terlalu banyak percobaan. Coba lagi nanti.';
+                break;
+            case 'auth/invalid-credential':
+                errorText.textContent = 'Password lama salah.';
+                break;
+            case 'auth/requires-recent-login':
+                errorText.textContent = 'Sesi login sudah kadaluarsa. Silakan logout lalu login ulang, baru ganti password.';
+                break;
+            default:
+                errorText.textContent = 'Gagal mengubah password. Coba lagi.';
+        }
+    }
+    
+    btn.disabled = false;
+    btn.textContent = 'Ubah Password';
+}
+
+
+// ========================================
 // LOGOUT
 // ========================================
 function logout() {
