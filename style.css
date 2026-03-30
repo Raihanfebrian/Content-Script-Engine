@@ -677,6 +677,7 @@ textarea.input-text-field {
     filter: blur(80px);
     opacity: 0.4;
     animation: floatBlob 20s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .blob-1 {
@@ -880,3 +881,128 @@ textarea.input-text-field {
         font-size: 10px;
     }
 }
+
+/* ========================================
+   TOAST NOTIFICATION
+======================================== */
+.toast-container {
+    position: fixed;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    z-index: 9998;
+    width: 90%;
+    max-width: 420px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.toast-container.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.toast-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+}
+
+.toast-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px 0;
+}
+
+.toast-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toast-icon.error {
+    background: linear-gradient(135deg, #FEE2E2, #FECACA);
+    color: #DC2626;
+}
+
+.toast-icon.success {
+    background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+    color: #059669;
+}
+
+.toast-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.toast-content {
+    flex: 1;
+    padding-bottom: 2px;
+}
+
+.toast-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 3px;
+}
+
+.toast-message {
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.55;
+}
+
+.toast-progress {
+    height: 3px;
+    background: #F1F5F9;
+    margin: 14px 20px 18px;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+}
+
+.toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.toast-progress-bar.error {
+    background: linear-gradient(90deg, #EF4444, #F87171);
+}
+
+.toast-progress-bar.success {
+    background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+.toast-card.toast-exit {
+    animation: toastExit 0.3s ease forwards;
+}
+
+@keyframes toastExit {
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ========================================
+   LONG-FORM INFO BANNER
+======================================== */
+.bg-blue-50 { background-color: #EFF6FF; }
+.border-blue-200 { border-color: #BFDBFE; }
+.text-blue-800 { color: #1E40AF; }
+.text-blue-600 { color: #2563EB; }
+.text-blue-500 { color: #3B82F6; }

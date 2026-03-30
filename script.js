@@ -579,7 +579,89 @@ const PROMPT_DICTIONARY = {
         "StoryBrand (Audiens = Pahlawan)": `Gunakan struktur StoryBrand:
 Posisikan audiens sebagai TOKOH UTAMA yang punya masalah.
 Lu (brand) adalah PANDUAN (Yoda/Gandalf) yang ngasih solusi.
-Alurnya: Masalah -> Pertemuan dengan Panduan -> Solusi -> Sukses.`
+Alurnya: Masalah -> Pertemuan dengan Panduan -> Solusi -> Sukses.`,
+        // ===== FRAMEWORK JUALAN (OTHERS) =====
+        "AIDCA (Curi Perhatian sampai Beli)": `Gunakan struktur AIDCA:
+1. ATTENTION: Pancing perhatian dengan kalimat shocking/fakta mengejutkan di 3 detik pertama.
+2. INTEREST: Bangun ketertarikan dengan cerita atau data yang relevan dengan masalah audiens.
+3. DESIRE: Picu keinginan dengan menunjukkan manfaat/transformasi yang menggiurkan secara spesifik.
+4. CONVICTION: Berikan bukti sosial, testimoni, atau data yang memperkuat kepercayaan.
+5. ACTION: Suruh mereka beli/ambil tindakan sekarang juga.`,
+
+        "4P (Janji & Bukti Nyata)": `Gunakan struktur 4P:
+1. PICTURE: Gambarkan kondisi ideal/solusi yang paling didambakan audiens secara emosional.
+2. PROMISE: Berikan janji bahwa produk/layanan ini bisa mewujudkannya.
+3. PROVE: Buktikan dengan testimoni nyata, demo, atau data kuantitatif.
+4. PUSH: Dorong audiens untuk mengambil tindakan sekarang, jangan tunda.`,
+
+        "SLAP (Bikin Kaget & Beli)": `Gunakan struktur SLAP:
+1. STOP: Hentikan scroll dengan visual/kalimat yang sangat tidak biasa dan mengejutkan.
+2. LOOK: Paksa audiens memperhatikan dengan fakta atau data yang tidak mereka sangka.
+3. ACTIVATE: Bangkitkan keinginan dengan menunjukkan solusi/hasil yang didambakan.
+4. PUSH: Dorong langsung ke CTA tanpa basa-basi.`,
+
+        "PASTOR (Masalah, Cerita, Promo)": `Gunakan struktur PASTOR:
+1. PROBLEM: Sebutkan masalah utama audiens secara spesifik, bukan generik.
+2. AGITATE: Perparah masalah dengan detail yang menyakitkan dan relate.
+3. STORY: Ceritakan pengalaman nyata (sendiri/orang lain) yang membangun empati.
+4. TRANSFORMATION: Tunjukkan perubahan positif setelah menggunakan solusi.
+5. OFFER: Tawarkan produk sebagai jalan keluar, lengkap dengan promo/urgensi.`,
+
+        "3 Reason Why (3 Alasan Beli)": `Gunakan struktur 3 Reason Why:
+1. Hook dengan pernyataan kontroversial: "Hanya 1 dari 10 orang yang tahu..."
+2. Sebutkan 3 alasan kuat kenapa mereka harus beli. Setiap alamat HARUS spesifik dan berbeda (jangan 3 alasan yang intinya sama).
+3. Setiap alasan harus bikin audiens merasa "rugi banget kalau nggak ambil".
+4. Akhiri dengan CTA yang menekankan urgency/keterbatasan.`,
+
+        "Stop-Fear-Listen (Takut & Dengerin)": `Gunakan struktur Stop-Fear-Listen:
+1. STOP: Buat audiens berhenti scroll dengan pernyataan tentang bahaya/risiko yang tidak mereka sadari.
+2. FEAR: Perkuat ketakutan dengan data/fakta/bukti bahwa risiko itu nyata dan dekat dengan mereka.
+3. LISTEN: Setelah audiens takut, baru berikan solusi/produk sebagai penyelamat yang logis.`,
+
+        // ===== FRAMEWORK EDUKASI (OTHERS) =====
+        "RTER (Gen Z Community)": `Gunakan struktur RTER untuk komunitas:
+1. RELATE: Buka dengan opini/pengalaman yang sangat relate dengan komunitas target. Gunakan bahasa dan referensi budaya mereka.
+2. TRUST: Bangun kepercayaan dengan sharing value/insight yang tidak klise. Tunjukkan lu benar-benar paham dunia mereka.
+3. ENGAGE: Ajukan pertanyaan atau pernyataan kontroversial yang memancing diskusi/debat di komentar.
+4. REPEAT: CTA yang fokus ke komunitas (join grup, follow untuk part 2, komen pendapatmu di bawah).`,
+
+        "Hero's Journey (Kisah Perjuangan)": `Gunakan struktur Hero's Journey:
+1. STATUS QUO: Ceritakan kondisi awal yang biasa/banyak orang alami.
+2. CALL TO ADVENTURE: Sebutkan titik balik/momen yang mengubah segalanya.
+3. TRIALS: Ceritakan rintangan/kesalahan yang dialami selama proses secara jujur.
+4. REVELATION: Temuan/pelajaran kunci yang didapat dari kesalahan tersebut.
+5. TRANSFORMATION: Hasil akhir setelah menerapkan pelajaran. Spesifik dan kredibel.
+6. CTA: Ajak audiens untuk memulai perjalanan mereka sendiri.`,
+
+        "Awareness Ladder (Edukasi Bertahap)": `Gunakan struktur Awareness Ladder:
+1. UNAWARE: Buka dengan fakta mengejutkan yang membuat audiens sadar ada masalah yang mereka anggap normal.
+2. PROBLEM AWARE: Jelaskan mengapa masalah itu terjadi dan dampaknya.
+3. SOLUTION AWARE: Perkenalkan konsep/cara penyelesaian yang belum banyak diketahui.
+4. PRODUCT AWARE: Tunjukkan bagaimana cara/produk spesifik ini menjawab masalah tersebut.
+5. MOST AWARE: Dorong audiens untuk mengambil langkah konkret sekarang.`,
+
+        "JTBD (Fokus 'Tugas' Produk)": `Gunakan struktur Jobs To Be Done:
+1. JOB: Sebutkan "tugas" yang ingin diselesaikan audiens dalam bahasa mereka sendiri (bukan bahasa produk). Contoh: "Lu mau punya followers yang beneran beli, bukan cuma nyetor angka."
+2. PAIN: Jelaskan frustrasi saat "tugas" itu belum terpecahkan.
+3. GAIN: Gambarkan kondisi ideal saat "tugas" itu terpecahkan secara emosional.
+4. SOLUTION: Tunjukkan bagaimana cara/produk ini menyelesaikan "tugas" tersebut secara spesifik.`,
+
+        "Failed-Growth-Success (Gagal & Sukses)": `Gunakan struktur Failed-Growth-Success:
+1. FAILED: Ceritakan kegagalan/momen terpuruk secara jujur dan detail. Buat audiens berkata "Sama gua juga".
+2. GROWTH: Jelaskan proses belajar/pivot yang dilakukan setelah kegagalan. Apa yang berubah di mindset?
+3. SUCCESS: Tunjukkan hasil akhir yang konkret dan kredibel setelah menerapkan pembelajaran tersebut.
+4. LESSON: Tarik 1 pelajaran universal yang bisa audiens terapkan di hidup mereka.`,
+
+        "Solution-Impact-Problem (Hasil Dulu)": `Gunakan struktur Solution-Impact-Problem:
+1. SOLUTION: Langsung tunjukkan hasil/benefit yang didapat. Buka dengan "Bayangin kalau..."
+2. IMPACT: Jelaskan dampak positif yang dirasakan secara detail (rasa emosional & logis).
+3. PROBLEM: Baru sebutkan masalah yang selama ini menghantui, dan kenapa tanpa solusi tadi mereka akan terus menderita.
+4. CTA: Dorong untuk mengambil solusi sekarang sebelum kembali ke masalah lama.`,
+
+        "Feature-Solution-Impact (Logis ke Emosi)": `Gunakan struktur Feature-Solution-Impact:
+1. FEATURE: Sebutkan fakta/fitur/data spesifik yang menarik perhatian secara logis.
+2. SOLUTION: Jelaskan bagaimana fakta itu menjadi solusi untuk masalah audiens.
+3. IMPACT: Ubah solusi logis tadi menjadi manfaat emosional yang bisa dirasakan (contoh: "bukan cuma hemat waktu, tapi lu bisa lebih banyak ngumpul sama keluarga").`,
     },
     
     hooks: {
@@ -670,6 +752,265 @@ let appState = {
 };
 
 // ========================================
+// PLATFORM-DURATION VALIDATION MAP
+// ========================================
+const PLATFORM_DURATION_MAP = {
+    // EDUKASI
+    'YouTube Video (Deep dive, penjelasan materi panjang)': {
+        allowed: ['Video Long-form (1–3 menit)', 'Video YouTube / Podcast (> 5 menit)', 'Live Streaming Outline / Script'],
+        errorMsg: 'YouTube Video hanya cocok untuk format Long-form (1-3 menit) atau Podcast (>5 menit).'
+    },
+    'Podcast (Spotify / Apple) (Format audio, obrolan mendalam)': {
+        allowed: ['Video YouTube / Podcast (> 5 menit)', 'Live Streaming Outline / Script'],
+        errorMsg: 'Podcast hanya cocok untuk format Podcast (>5 menit) atau Live Streaming.'
+    },
+    'TikTok / IG Reels / YT Shorts (Edukasi fast-paced, tips singkat)': {
+        allowed: ['Video Super Short (< 15 detik)', 'Video Short (15–30 detik)', 'Video Medium (30–60 detik)'],
+        errorMsg: 'Short-form video hanya cocok untuk durasi di bawah 60 detik.'
+    },
+    'Instagram Feed / Carousel (Edukasi visual geser)': {
+        allowed: ['Carousel / Microblog (5–10 Slide)'],
+        errorMsg: 'Instagram Feed hanya cocok untuk format Carousel.'
+    },
+    'Twitter / X / Threads (Opini, micro-blogging teks)': {
+        allowed: ['Teks / Thread (Khusus X/LinkedIn/Email)'],
+        errorMsg: 'Twitter/X hanya cocok untuk format Thread/Teks.'
+    },
+    'Email Newsletter (Tulisan personal & edukasi rutin)': {
+        allowed: ['Teks / Thread (Khusus X/LinkedIn/Email)'],
+        errorMsg: 'Email Newsletter hanya cocok untuk format Teks/Thread.'
+    },
+    'Pinterest (Infografis, quotes, inspirasi visual)': {
+        allowed: ['Carousel / Microblog (5–10 Slide)', 'Single Image / Foto Statis + Caption Panjang'],
+        errorMsg: 'Pinterest hanya cocok untuk format Carousel atau Single Image.'
+    },
+    // JUALAN
+    'YouTube Video (Format panjang, review mendalam)': {
+        allowed: ['Video Long-form (1–3 menit)', 'Video YouTube / Podcast (> 5 menit)', 'Live Streaming Outline / Script'],
+        errorMsg: 'YouTube Video hanya cocok untuk format Long-form atau Podcast (>5 menit).'
+    },
+    'TikTok / IG Reels / YT Shorts (Video vertikal cepat & visual)': {
+        allowed: ['Video Super Short (< 15 detik)', 'Video Short (15–30 detik)', 'Video Medium (30–60 detik)'],
+        errorMsg: 'Short-form video hanya cocok untuk durasi di bawah 60 detik.'
+    },
+    'IG / FB Story (Video 15 detik, urgensi tinggi)': {
+        allowed: ['Video Super Short (< 15 detik)', 'Video Short (15–30 detik)', 'Story Sequence (3–5 Frame)'],
+        errorMsg: 'Story hanya cocok untuk format Super Short, Short, atau Story Sequence.'
+    },
+    'Twitter / X (Thread jualan / soft selling teks)': {
+        allowed: ['Teks / Thread (Khusus X/LinkedIn/Email)'],
+        errorMsg: 'Twitter/X hanya cocok untuk format Thread/Teks.'
+    },
+    'Email Marketing (Subject line & isi newsletter jualan)': {
+        allowed: ['Teks / Thread (Khusus X/LinkedIn/Email)'],
+        errorMsg: 'Email Marketing hanya cocok untuk format Teks/Thread.'
+    },
+    'Shopee Video / Tokopedia Play (Format live/video commerce)': {
+        allowed: ['Video Short (15–30 detik)', 'Video Medium (30–60 detik)', 'Live Streaming Outline / Script'],
+        errorMsg: 'Video Commerce hanya cocok untuk format Short, Medium, atau Live Streaming.'
+    }
+};
+
+/**
+ * Cek apakah format yang dipilih termasuk Long-Form
+ * Long-Form = YouTube/Podcast >5 menit ATAU Live Streaming
+ */
+function isLongFormFormat() {
+    const fmt = (appState.formatDurasi || '').toLowerCase();
+    return fmt.includes('> 5 menit') || fmt.includes('live streaming');
+}
+
+/**
+ * Validasi platform vs durasi
+ * Returns: { valid: boolean, errorMsg: string }
+ */
+function validatePlatformDuration() {
+    const platform = appState.platform;
+    const duration = appState.formatDurasi;
+    
+    if (!platform || !duration) return { valid: true, errorMsg: '' };
+    
+    const restriction = PLATFORM_DURATION_MAP[platform];
+    if (!restriction) return { valid: true, errorMsg: '' }; // Tidak ada aturan khusus
+    
+    const isValid = restriction.allowed.includes(duration);
+    return {
+        valid: isValid,
+        errorMsg: isValid ? '' : restriction.errorMsg
+    };
+}
+
+
+// ========================================
+// STATE PERSISTENCE (LOCAL STORAGE)
+// ========================================
+function saveStateToStorage() {
+    if (!appState.masterFilter) return;
+    localStorage.setItem('scriptEngineState', JSON.stringify(appState));
+}
+
+function loadStateFromStorage() {
+    try {
+        const saved = localStorage.getItem('scriptEngineState');
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function clearStateStorage() {
+    localStorage.removeItem('scriptEngineState');
+}
+
+// ========================================
+// DEVICE ID
+// ========================================
+function getOrCreateDeviceId() {
+    let deviceId = localStorage.getItem('scriptEngineDeviceId');
+    if (!deviceId) {
+        deviceId = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('scriptEngineDeviceId', deviceId);
+    }
+    return deviceId;
+}
+
+// ========================================
+// RESTORE INPUT VALUES (SETELAH RENDER DOM)
+// ========================================
+function restoreInputValues() {
+    const selectFields = ['goal', 'platform', 'role', 'persona', 'jenisKonten', 'formatDurasi', 'gayaVisual', 'framework', 'hook', 'levelAwareness', 'psychographics', 'targetMarket', 'compliance', 'jenisProduk', 'ctaJualan', 'kategoriNiche', 'ctaEdukasi', 'gayaBahasa', 'jumlahVariasi'];
+
+    selectFields.forEach(field => {
+        if (!appState[field]) return;
+        const el = document.getElementById(`input-${field}`);
+        if (!el) return;
+
+        const val = appState[field];
+        const optionExists = Array.from(el.options).some(o => o.value === val);
+
+        if (optionExists) {
+            el.value = val;
+        } else {
+            const lainnyaOption = Array.from(el.options).find(o =>
+                o.value.toLowerCase().includes('lainnya') || o.value.toLowerCase().includes('manual')
+            );
+            if (lainnyaOption) {
+                el.value = lainnyaOption.value;
+                const manualContainer = document.getElementById(`manual-${field}`);
+                if (manualContainer) {
+                    manualContainer.classList.remove('hidden');
+                    const inputEl = manualContainer.querySelector('input');
+                    if (inputEl) inputEl.value = val;
+                }
+            }
+        }
+    });
+
+    const textFields = ['namaProduk', 'referensiMateri', 'painPoint', 'solusiUtama', 'uniqueValue', 'hargaPromo', 'asetVisual', 'topikUtama', 'bahanMateri', 'keresahan', 'insightUtama', 'sudutPandang', 'leadMagnet', 'targetKeyword'];
+
+    textFields.forEach(field => {
+        if (!appState[field]) return;
+        const el = document.getElementById(`input-${field}`);
+        if (el) el.value = appState[field];
+    });
+
+    updateProgressBar();
+}
+
+// ========================================
+// SESSION MANAGEMENT (MAX 2 DEVICE)
+// ========================================
+let isLoggingOut = false;
+let sessionUnsubscribe = null;
+
+async function manageSession() {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const db = firebase.firestore();
+    const deviceId = getOrCreateDeviceId();
+    const sessionRef = db.collection('sessions').doc(`${user.uid}_${deviceId}`);
+
+    try {
+        const snapshot = await db.collection('sessions')
+            .where('uid', '==', user.uid)
+            .orderBy('lastActive', 'asc')
+            .get();
+
+        if (snapshot.size >= 2) {
+            for (const doc of snapshot.docs) {
+                if (doc.id !== sessionRef.id) {
+                    await doc.ref.delete();
+                    break;
+                }
+            }
+        }
+
+        await sessionRef.set({
+            uid: user.uid,
+            deviceId: deviceId,
+            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        startSessionWatch(user.uid, deviceId);
+    } catch (e) {
+        console.error('Session management error:', e);
+    }
+}
+
+function startSessionWatch(uid, deviceId) {
+    if (sessionUnsubscribe) sessionUnsubscribe();
+
+    const db = firebase.firestore();
+    const sessionRef = db.collection('sessions').doc(`${uid}_${deviceId}`);
+
+    sessionUnsubscribe = sessionRef.onSnapshot((doc) => {
+        if (!doc.exists && !isLoggingOut) {
+            alert("Akun Anda digunakan di perangkat lain. Anda telah keluar otomatis.");
+            firebase.auth().signOut();
+            window.location.href = 'login.html';
+        }
+    });
+
+    setInterval(async () => {
+        try {
+            await sessionRef.update({
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (e) { /* ignore */ }
+    }, 60000);
+}
+
+// ========================================
+// AUTO LOGOUT (12 JAM INAKTIF)
+// ========================================
+function startInactivityTimer() {
+    const LIMIT = 12 * 60 * 60 * 1000;
+
+    function updateActivity() {
+        localStorage.setItem('scriptEngineLastActivity', Date.now().toString());
+    }
+
+    function checkInactivity() {
+        const last = parseInt(localStorage.getItem('scriptEngineLastActivity') || '0');
+        if (Date.now() - last > LIMIT) {
+            isLoggingOut = true;
+            firebase.auth().signOut();
+            window.location.href = 'login.html';
+        }
+    }
+
+    ['click', 'keydown', 'scroll', 'mousemove', 'touchstart'].forEach(evt => {
+        document.addEventListener(evt, updateActivity, { passive: true });
+    });
+
+    updateActivity();
+    setInterval(checkInactivity, 60000);
+}
+
+
+// ========================================
 // LOGIC: MASTER FILTER (UPDATED)
 // ========================================
 function selectMasterFilter(type) {
@@ -703,6 +1044,7 @@ function selectMasterFilter(type) {
 
     // DIHAPUS: Preview tidak lagi auto-update saat pilih filter
     // Preview hanya muncul setelah klik "Generate Script"
+    saveStateToStorage();
 }
 
 // ========================================
@@ -825,9 +1167,23 @@ function handleInputChange(fieldId, value) {
         if (manualContainer) manualContainer.classList.add('hidden');
         appState[fieldId] = value; 
     }
-    
+
+    // === AUTO-LOCK VARIASI UNTUK LONG-FORM ===
+    if (fieldId === 'formatDurasi') {
+        if (isLongFormFormat()) {
+            // Paksa lock ke 1 variasi
+            appState.jumlahVariasi = '1 Script (Fokus & Presisi)';
+            renderSection6();
+            showToast('info', 'Format Long-Form Terdeteksi', 'Video >5 menit & Live Streaming hanya bisa generate 1 naskah agar AI bisa menulis secara mendalam tanpa terpotong batas token.');
+        } else if (appState.jumlahVariasi === '1 Script (Fokus & Presisi)') {
+            // Jika user ganti ke format bukan long-form, unlock kembali
+            renderSection6();
+        }
+    }
+
     // Update progress bar setiap ada perubahan
     updateProgressBar();
+    saveStateToStorage();
 }
 
 // ========================================
@@ -967,7 +1323,7 @@ function renderSection3() {
             
             <!-- Header Section 3 -->
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-lg font-bold text-slate-600">3</div>
+                <div class="section-number">3</div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h3 class="text-xl font-bold text-slate-900">Strategi Copywriting</h3>
@@ -1138,8 +1494,8 @@ function createTextArea(id, label, placeholder, tooltipText = '', isRequired = f
 // Handler khusus untuk Input Text/Area
 function handleTextInput(id, value) {
     appState[id] = value;
-    // Update progress bar setiap ada perubahan
     updateProgressBar();
+    saveStateToStorage();
 }
 
 // ========================================
@@ -1258,7 +1614,7 @@ function renderSection5() {
             
             <!-- Header Section 5 -->
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-lg font-bold text-slate-600">5</div>
+                <div class="section-number">5</div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h3 class="text-xl font-bold text-slate-900">Detail Produk & Konteks Konten</h3>
@@ -1298,11 +1654,43 @@ function renderSection5() {
 // ========================================
 function renderSection6() {
     const container = document.getElementById('section6Container');
-    
-    // PERUBAHAN: Section 6 bersifat universal, bisa langsung muncul
-    // Hapus baris: if (!appState.masterFilter) return;
-
     const data = CONFIG.section6;
+    const isLong = isLongFormFormat();
+
+    // Buat opsi variasi (dinamis: lock atau bebas)
+    let variationsHtml = '';
+    if (isLong) {
+        // Long-form: Hanya 1 opsi, disabled
+        variationsHtml = `
+            <option value="1 Script (Fokus & Presisi)" selected>1 Script (Fokus & Presisi)</option>
+            <option value="2 Script (A/B Testing Hook)" disabled>2 Script — Tidak tersedia untuk Long-Form</option>
+            <option value="3 Script (Variasi Hook + Angle)" disabled>3 Script — Tidak tersedia untuk Long-Form</option>
+            <option value="5 Script (Produksi Massal)" disabled>5 Script — Tidak tersedia untuk Long-Form</option>
+        `;
+    } else {
+        variationsHtml = data.variations.map(opt => {
+            const isSelected = appState.jumlahVariasi === opt ? 'selected' : '';
+            return `<option value="${opt}" ${isSelected}>${opt}</option>`;
+        }).join('');
+    }
+
+    // Banner peringatan Long-Form
+    const longFormBanner = isLong ? `
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <p class="text-sm font-semibold text-blue-800">Mode Long-Form Aktif</p>
+                <p class="text-xs text-blue-600 mt-1 leading-relaxed">Video >5 menit membutuhkan ~750-1.000 kata per naskah. ChatGPT memiliki batas output ~1.000 kata per generate, sehingga batch shooting tidak memungkinkan. Dropdown dikunci ke <strong>1 Script</strong> agar AI bisa menulis secara mendalam tanpa memotong isi.</p>
+            </div>
+        </div>
+    ` : '';
+
+    // Tooltip konten dinamis
+    const tooltipContent = isLong
+        ? 'Untuk format Long-Form, variasi dikunci ke 1 naskah. Alasannya: satu video 5 menit butuh ~750-1.000 kata. Batas output ChatGPT hanya ~1.000 kata per generate. Kalau dipaksa batch 5, AI akan mengompres semua naskah jadi super pendek dan hancur kualitasnya.'
+        : data.tooltips.header;
 
     const html = `
         <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 animate-fadeInUp">
@@ -1313,7 +1701,6 @@ function renderSection6() {
                 <div>
                     <div class="flex items-center gap-2">
                         <h3 class="text-xl font-bold text-slate-900">Pengaturan Output & Variasi</h3>
-                        <!-- Tooltip Header Section 6 -->
                         <div class="tooltip-container">
                             <span class="tooltip-icon">?</span>
                             <div class="tooltip-box">
@@ -1324,7 +1711,7 @@ function renderSection6() {
                                     <span>Info</span>
                                 </div>
                                 <div class="tooltip-content">
-                                    ${data.tooltips.header}
+                                    ${tooltipContent}
                                 </div>
                             </div>
                         </div>
@@ -1333,11 +1720,24 @@ function renderSection6() {
                 </div>
             </div>
 
+            ${longFormBanner}
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 
-                <!-- 1. Jumlah Variasi -->
-                <!-- Gunakan Modal (param terakhir = true) karena penjelasan opsi panjang -->
-                ${createSelectField('jumlahVariasi', 'Jumlah Variasi Script', data.tooltips.variationInfo, data.variations, true)}
+                <!-- Jumlah Variasi -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Jumlah Variasi Script
+                        <span class="info-icon-btn" 
+                              data-modal-title="Jumlah Variasi Script" 
+                              data-modal-content="${isLong ? 'Mode Long-Form aktif. Dropdown dikunci ke 1 naskah agar kualitas output maksimal.' : data.tooltips.variationInfo.replace(/"/g, '&quot;').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim()}" 
+                              onclick="triggerInfoModal(this)">?</span>
+                    </label>
+                    <select id="input-jumlahVariasi" class="custom-select" onchange="handleInputChange('jumlahVariasi', this.value)" ${isLong ? 'disabled' : ''}>
+                        ${variationsHtml}
+                    </select>
+                    ${isLong ? '<p class="text-xs text-blue-500 mt-2 font-medium">🔒 Dikunci otomatis karena format Long-Form</p>' : ''}
+                </div>
 
             </div>
         </div>
@@ -1351,7 +1751,22 @@ function renderSection6() {
 // LOGIC: RESET FORM
 // ========================================
 function resetForm() {
-    if(!confirm("Yakin mau reset semua? Data yang sudah diisi akan hilang.")) return;
+    const modal = document.getElementById('resetModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeResetModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('resetModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function executeReset() {
+    const modal = document.getElementById('resetModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
 
     // 1. Reset State
     appState = {
@@ -1367,36 +1782,24 @@ function resetForm() {
     // 2. Hapus Active State Card
     document.querySelectorAll('.card-option').forEach(card => card.classList.remove('active'));
 
-    // 3. Bersihkan isi container (Jangan sembunyikan, tapi kosongkan)
-    // Kecuali Section 1 yang penting, kita reset dropdown/input di dalamnya via render ulang
-    // Untuk simplicity, kita bisa render ulang section 1-6 dengan data kosong
-    
-    // Kosongkan konten dinamis
-    const containers = ['dynamicFormContainer', 'section2Container', 'section3Container', 'section4Container', 'section5Container', 'section6Container'];
-    containers.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.innerHTML = '';
-    });
+    // 3. Bersihkan section 1 dinamis
+    document.getElementById('dynamicFormContainer').innerHTML = '';
 
-    // Reset Tombol Action
+    // 4. Render ulang section 2 - 6 ke state awal (waiting)
+    renderSection2();
+    renderSection3();
+    renderSection4();
+    renderSection5();
+    renderSection6();
     renderFinalAction();
 
-    // Reset Preview ke tampilan awal
+    // 5. Reset Preview ke tampilan Mac Window placeholder
     const previewContainer = document.getElementById('previewContainer');
-    previewContainer.innerHTML = `
-        <div class="text-center text-slate-400 pt-20">
-            <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <h3 class="font-bold text-lg text-slate-300">Preview Prompt</h3>
-            <p class="text-sm mt-2">Hasil prompt akan muncul di sini secara real-time saat Anda mengisi form.</p>
-        </div>
-    `;
+    showPreviewPlaceholder(previewContainer);
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Reset progress bar
     updateProgressBar();
+    clearStateStorage();
 }
 
 
@@ -1517,7 +1920,7 @@ function openChatGPT() {
         window.open(chatGPTUrl, '_blank');
         
         // Feedback user
-        alert("✅ Prompt sudah disalin! Kamu akan diarahkan ke ChatGPT.\n\nPaste (Ctrl+V) jika prompt tidak muncul otomatis.");
+        showToast('success', 'Prompt Tersalin', 'Kamu akan diarahkan ke ChatGPT. Paste (Ctrl+V) jika tidak muncul otomatis.');
     }).catch(err => {
         console.error('Gagal menyalin: ', err);
         alert("Gagal menyalin prompt. Silakan salin manual.");
@@ -1528,50 +1931,45 @@ function openChatGPT() {
 // GENERATE SCRIPT HANDLER (FINAL)
 // ========================================
 function generateScript() {
-    // Validasi input Section 2
+    const platformCheck = validatePlatformDuration();
+    if (!platformCheck.valid) {
+        showToast('error', 'Format Tidak Sinkron', platformCheck.errorMsg);
+        return;
+    }
+
     if (!appState.jenisKonten || !appState.formatDurasi || !appState.gayaVisual) {
-        alert("⚠️ Lengkapi semua pilihan di Section 2 terlebih dahulu.");
+        showToast('error', 'Section 2 Belum Lengkap', 'Lengkapi Jenis Konten, Format & Durasi, dan Gaya Visual terlebih dahulu.');
         return;
     }
 
-    // Validasi input Section 3
     if (!appState.framework || !appState.hook) {
-        alert("⚠️ Lengkapi Framework dan Hook di Section 3 terlebih dahulu.");
+        showToast('error', 'Section 3 Belum Lengkap', 'Pilih Framework Copywriting dan Hook Strategy terlebih dahulu.');
         return;
     }
 
-    // Validasi Section 4
     if (!appState.levelAwareness || !appState.psychographics || !appState.targetMarket || !appState.compliance) {
-        alert("⚠️ Lengkapi semua pilihan Target Audience di Section 4.");
+        showToast('error', 'Section 4 Belum Lengkap', 'Lengkapi Level Awareness, Psychographics, Target Market, dan Compliance.');
         return;
     }
 
-    // Validasi input Section 5 (Dinamis)
     if (appState.masterFilter === 'jualan') {
         if (!appState.namaProduk || !appState.jenisProduk || !appState.painPoint || !appState.solusiUtama || !appState.uniqueValue || !appState.ctaJualan || !appState.gayaBahasa) {
-            alert("⚠️ Lengkapi semua field wajib di Section 5 (Detail Produk Jualan).");
+            showToast('error', 'Section 5 Belum Lengkap', 'Lengkapi semua field wajib di Detail Produk (Nama, Jenis, Pain Point, Solusi, USP, CTA, Gaya Bahasa).');
             return;
         }
     } else {
         if (!appState.kategoriNiche || !appState.ctaEdukasi || !appState.gayaBahasa) {
-            alert("⚠️ Lengkapi Kategori Niche, CTA, dan Gaya Bahasa di Section 5.");
+            showToast('error', 'Section 5 Belum Lengkap', 'Pilih Kategori Niche, Call to Action, dan Gaya Bahasa terlebih dahulu.');
             return;
         }
     }
 
-    // Validasi input Section 6
     if (!appState.jumlahVariasi) {
-        alert("⚠️ Pilih jumlah variasi script di Section 6.");
+        showToast('error', 'Section 6 Belum Lengkap', 'Pilih jumlah variasi script yang ingin dihasilkan.');
         return;
     }
-    
-    // Jika semua valid, cukup update preview (atau bisa langsung copy)
+
     updatePreview();
-    
-    // Auto scroll ke preview di mobile
-    // document.getElementById('previewContainer').scrollIntoView({ behavior: 'smooth' });
-        
-    // Langsung generate tanpa notifikasi
 }
 
 // ========================================
@@ -1581,7 +1979,16 @@ function generatePrompt() {
     const s = appState; 
     const isJualan = s.masterFilter === 'jualan';
 
-    const getVal = (val, fallback = "Tentukan sendiri yang relevan") => val || fallback;
+    // getVal: Untuk field yang SUDAH WAJIB divalidasi sebelum generate
+    // Tidak ada fallback - jika kosong, return string kosong
+    const getVal = (val) => val || '';
+    
+    // getOptional: Untuk field opsional yang boleh kosong
+    // Jika kosong, beri instruksi ke AI (tanpa tanda kurung mencurigakan)
+    const getOptional = (val, aiInstruction = '') => {
+        if (val && val.trim()) return val;
+        return aiInstruction ? aiInstruction : '';
+    };
 
     // ========================================
     // 1. CONDITIONAL LOGIC: TONE & PRONOUNS
@@ -1690,27 +2097,42 @@ function generatePrompt() {
         p += `- Solusi yang Dijanjikan: ${getVal(s.solusiUtama)}\n`;
         p += `- USP (Pembeda): ${getVal(s.uniqueValue)}\n`;
         if (s.hargaPromo) p += `- Harga/Promo: ${s.hargaPromo}\n`;
-        if (s.referensiMateri) p += `- Referensi: ${s.referensiMateri}\n`;
+        if (s.referensiMateri) p += `- Referensi Materi: ${s.referensiMateri}\n`;
         p += `- CTA: ${getVal(s.ctaJualan)}\n\n`;
     } else {
         p += `- Niche: ${getVal(s.kategoriNiche)}\n`;
-        p += `- Topik Utama: ${getVal(s.topikUtama)}\n`;
+        p += `- Topik Utama: ${s.topikUtama || 'Riset dan pilih 1 topik spesifik yang sedang viral/tren di niche ini. DILARANG topik klise seperti overthinking, mager, insecure, atau self-help generik.'}\n`;
         if (s.bahanMateri) p += `- Bahan Materi: ${s.bahanMateri}\n`;
-        p += `- Keresahan Audiens: ${getVal(s.keresahan)}\n`;
-        p += `- Insight Utama: ${getVal(s.insightUtama)}\n`;
+        p += `- Keresahan Audiens: ${s.keresahan || 'Riset 1 keresahan spesifik yang sering muncul di komentar/DM/Forum target audiens ini. Bukan keresahan umum.'}\n`;
+        p += `- Insight Utama: ${s.insightUtama || 'Tulis 1 insight orisinal atau uncommon opinion yang berlawanan dengan asumsi umum kebanyakan orang.'}\n`;
         if (s.sudutPandang) p += `- Sudut Pandang: ${s.sudutPandang}\n`;
         if (s.leadMagnet) p += `- Lead Magnet: ${s.leadMagnet}\n`;
         p += `- CTA: ${getVal(s.ctaEdukasi)}\n\n`;
     }
+
 
     // ========================================
     // 7. RULES STRICT (REVISED - SUPER STRICT)
     // ========================================
     p += `[4. RULES STRICT - WAJIB PATUHI!]\n`;
     p += `1. ANTI-BAHASA BAKU & KAKU:\n`;
-    p += `   - DILARANG KERAS menggunakan kata: "Anda", "Kau", "Kalian", "Merupakan", "Sangatlah", "Adalah", "Oleh karena itu", "Kesimpulannya", "Mari kita", "Di era digital ini", "Penting untuk diketahui", "Salah satu cara", "Guna".\n`;
+
+    // Kata haram universal (selalu dilarang regardless tone)
+    p += `   - DILARANG KERAS menggunakan kata: "Merupakan", "Sangatlah", "Adalah", "Oleh karena itu", "Kesimpulannya", "Mari kita", "Di era digital ini", "Penting untuk diketahui", "Salah satu cara", "Guna".\n`;
+
+    // Kata haram dinamis berdasarkan tone
+    if (tone.includes('gen-z') || tone.includes('gaul') || tone.includes('santai') || tone.includes('witty')) {
+        p += `   - DILARANG KERAS kata ganti formal: "Anda", "Kau", "Kalian". GANTI dengan "Gue/Lo".\n`;
+    } else if (tone.includes('profesional') || tone.includes('edukatif')) {
+        p += `   - DILARANG KERAS kata ganti slang: "Gue", "Lo", "Gak", "Nggak", "Banget", "Bikin", "Nih", "Dah". GANTI dengan "Saya/Anda/Kamu".\n`;
+    } else if (tone.includes('bold') || tone.includes('urgent')) {
+        p += `   - DILARANG KERAS kata ganti terlalu formal: "Anda", "Kalian". Gunakan "Gue/Lo" atau "Saya/Kamu" yang tegas.\n`;
+    } else {
+        p += `   - Hindari kata ganti yang terlalu kaku: "Anda", "Kalian". Gunakan "Aku/Kamu" atau "Saya/Kamu".\n`;
+    }
+
     p += `   - JANGAN gunakan struktur kalimat pasif yang kaku (contoh salah: "Hal ini dapat dilakukan dengan...").\n`;
-    p += `   - REPLACE dengan kata ganti yang sudah ditentukan di atas.\n`;
+    p += `   - WAJIB patuh pada aturan Kata Ganti (Pronouns) yang sudah ditentukan di bagian [1. PERSONA & AUDIENS] di atas. Tidak boleh ada kontradiksi.\n`;
     p += `2. PACING & INTONASI NATURAL (SPOKEN WORD):\n`;
     p += `   - Tulis naskah seperti naskah ORANG NGOBROL, bukan artikel blog.\n`;
     p += `   - Gunakan partikel bahasa lisan Indonesia dengan natural: "sih", "deh", "kan", "kok", "dong", "mah" (tapi jangan di setiap kalimat).\n`;
@@ -1723,21 +2145,82 @@ function generatePrompt() {
     p += `   - DILARANG menggunakan karakter newline (\n) di dalam sel tabel.\n`;
     p += `   - Jika perlu ganti paragraf dalam 1 sel, gunakan tag HTML <br>.\n`;
     p += `   - Tulis naskah dalam satu paragraf utuh per section.\n`;
+    p += `5. KEDALAMAN MATERI & PACING (WAJIB - HITUNG MATEMATIS):\n`;
+    p += `   - Kecepatan bicara normal: 2.5 kata/detik.\n`;
+    p += `   - RUMUS WAJIB: Durasi (detik) × 2.5 = Jumlah Kata MINIMAL naskah.\n`;
+    p += `   - Contoh: Durasi 60 detik → Naskah WAJIB minimal 150 kata.\n`;
+    p += `   - Contoh: Durasi 30 detik → Naskah WAJIB minimal 75 kata.\n`;
+    p += `   - DILARANG KERAS membuat naskah yang kurang dari hitungan rumus di atas.\n`;
+    p += `   - Elaborasikan SETIAP poin framework dengan detail yang padat dan substansial.\n`;
+    p += `   - Jangan potong penjelasan di tengah jalan. Setiap section HARUS terasa "kenyang" dan bernilai.\n`;
+    p += `   - DILARANG KERAS kasih tips klise (contoh larangan: "jangan malas", "minum air putih", "istirahat cukup", "mulai dari sekarang", "konsisten").\n`;
+    p += `   - Berikan MINIMAL 1 insight spesifik, actionable, atau uncommon opinion di setiap script.\n\n`;
 
-    if (isFaceless) p += `5. FACELESS: Dilarang instruksi senyum/gesture wajah. Fokus ke visual layar/B-Roll/Text Overlay.\n`;
-    if (!isComplianceAman && s.compliance) p += `6. COMPLIANCE (${s.compliance}): Dilarang overclaim (klaim berlebihan). Gunakan bahasa aman (membantu, mendukung, dsb).\n`;
-    if (s.targetKeyword) p += `7. SEO: Selipkan natural keyword "${s.targetKeyword}" di caption atau narasi.\n`;
-    if (s.asetVisual) p += `8. ASET: Sesuaikan adegan dengan aset yang tersedia: "${s.asetVisual}".\n\n`;
+    if (isFaceless) p += `6. FACELESS: Dilarang instruksi senyum/gesture wajah. Fokus ke visual layar/B-Roll/Text Overlay.\n`;
+    if (!isComplianceAman && s.compliance) p += `7. COMPLIANCE (${s.compliance}): Dilarang overclaim (klaim berlebihan). Gunakan bahasa aman (membantu, mendukung, dsb).\n`;
+    if (s.targetKeyword) p += `8. SEO: Selipkan natural keyword "${s.targetKeyword}" di caption atau narasi.\n`;
+    if (s.asetVisual) p += `9. ASET: Sesuaikan adegan dengan aset yang tersedia: "${s.asetVisual}".\n\n`;
 
     // ========================================
-    // 8. FORMAT OUTPUT DINAMIS (TABLE BASED)
+    // 8. FORMAT OUTPUT DINAMIS
     // ========================================
-    p += `[5. FORMAT OUTPUT - WAJIB GUNAKAN TABEL]\n`;
-    p += `Sajikan output dalam format TABEL MARKDOWN yang rapih agar mudah dibaca dan di-copy.\n\n`;
+    const useLongFormFormat = isLongFormFormat();
 
-    if (isCarousel) {
+    if (useLongFormFormat) {
+        // ========================================
+        // FORMAT HEADING (KHUSUS LONG-FORM)
+        // ========================================
+        p += `[5. FORMAT OUTPUT - KHUSUS LONG-FORM]\n`;
+        p += `Konten ini BERFORMAT PANJANG. DILARANG KERAS menggunakan format Tabel Markdown.\n`;
+        p += `Tabel menyebabkan AI memotong kalimat jadi pendek. Gunakan format HEADING & PARAGRAF agar naskah bisa ditulis panjang dan mendalam.\n\n`;
+        p += `Berikut template output yang WAJIB kamu ikuti:\n\n`;
+        p += `---\n\n`;
+        p += `## 🎬 SCRIPT: [Judul Angle yang Menarik]\n`;
+        p += `*Hook Strategy:* [Sebutkan taktik hook yang dipilih]\n`;
+        p += `*Framework:* [Sebutkan framework yang dipilih]\n`;
+        p += `*Estimasi Durasi:* [Hitung dari jumlah kata ÷ 2.5 kata/detik]\n\n`;
+        p += `### [HOOK] (15-30 detik)\n`;
+        p += `**Visual:** [Deskripsikan adegan pembuka secara detail - gerakan kamera, ekspresi, prop, lighting]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah hook di sini - untuk long-form, hook boleh lebih panjang karena audiens sudah commit menonton. Buka dengan cerita atau konteks yang bikin penasaran, lalu baru masuk ke inti topik. Minimal 5-7 kalimat atau sekitar 40-75 kata.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 1 DARI FRAMEWORK]\n`;
+        p += `**Visual:** [Deskripsikan adegan untuk step pertama framework secara detail]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 1 sesuai instruksi framework. Elaborasikan dengan detail, contoh konkret, atau analogi. Jangan potong. Tulis minimal 3-5 kalimat yang padat dan mengalir natural.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 2 DARI FRAMEWORK]\n`;
+        p += `**Visual:** [Deskripsikan adegan untuk step kedua framework]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 2 sesuai instruksi framework. Elaborasikan dengan detail. Tulis minimal 3-5 kalimat.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 3 DARI FRAMEWORK] (jika ada)\n`;
+        p += `**Visual:** [Deskripsikan adegan]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 3. Elaborasikan.]\n\n`;
+        p += `---\n\n`;
+        p += `(Lanjutkan step-step selanjutnya sesuai framework hingga selesai...)\n\n`;
+        p += `---\n\n`;
+        p += `### [CTA] (5-10 detik)\n`;
+        p += `**Visual:** [Deskripsikan adegan penutup - gesture menunjuk link, zoom in, dll]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah CTA yang jelas, tegas, dan direct. Minimal 2 kalimat.]\n\n`;
+        p += `---\n\n`;
+        p += `## 📝 CAPTION\n`;
+        p += `[Tulis caption panjang MINIMAL 3 paragraf. SETIAP paragraf WAJIB berisi minimal 3-4 kalimat yang substansial. Paragraf 1: Hook/keresahan yang relate dengan audiens. Paragraf 2: Value tambahan yang TIDAK ADA di video (jelaskan lebih dalam, beri insight baru yang memperkuat pesan). Paragraf 3: CTA yang jelas dan spesifik.]\n\n`;
+        p += `## # HASHTAG\n`;
+        p += `[3-5 hashtag relevant]\n\n`;
+        p += `---\n\n`;
+        p += `⚠️ PERINGATAN FINAL:\n`;
+        p += `- TOTAL NASKAH NARASI WAJIB minimal [hitung: durasi detik × 2.5] kata.\n`;
+        p += `- DILARANG menggunakan format tabel di manapun dalam output ini.\n`;
+        p += `- Setiap section narasi HARUS berupa paragraf utuh yang panjang, bukan poin-poin singkat.\n`;
+        p += `- Jangan berhenti menulis di tengah kalimat. Selesaikan setiap section hingga tuntas.\n\n`;
+
+    } else if (isCarousel) {
         // ===== FORMAT CAROUSEL/SLIDES =====
-        p += `Konten berbentuk CAROUSEL/SLIDES. Gunakan format TABEL berikut:\n\n`;
+        p += `[5. FORMAT OUTPUT - WAJIB GUNAKAN TABEL]\n`;
+        p += `Sajikan output dalam format TABEL MARKDOWN yang rapih agar mudah dibaca dan di-copy.\n\n`;
         p += `**Variasi [No]: [Judul Angle]**\n`;
         p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
         p += `| Slide | Visual (Deskripsi Gambar/Desain) | Teks Overlay (Copy di Gambar) |\n`;
@@ -1745,13 +2228,14 @@ function generatePrompt() {
         p += `| 1 (Cover) | [Deskripsi visual cover yang menarik perhatian] | "[Headline utama yang bikin penasaran]" |\n`;
         p += `| 2 s/d N (Isi) | [Deskripsi visual per slide, jaga konsistensi warna/font] | "[Poin/value per slide - SINGKAT! Max 20 kata]" |\n`;
         p += `| Akhir (CTA) | [Deskripsi visual slide penutup dengan arrow/cta button] | "[Ajakan action yang jelas: Follow, Save, Link Bio]" |\n\n`;
-        p += `**Caption:** [Copywriting singkat]\n`;
+        p += `**Caption:** [Tulis caption panjang MINIMAL 3 paragraf. SETIAP paragraf WAJIB berisi minimal 3-4 kalimat yang substansial. Paragraf 1: Hook/keresahan yang relate dengan audiens. Paragraf 2: Value tambahan yang TIDAK ADA di carousel (jelaskan lebih dalam, beri insight baru). Paragraf 3: CTA yang jelas dan spesifik.]\n`;
         p += `**Hashtag:** [3-5 hashtag relevant]\n`;
         p += `----------------------------------\n`;
 
     } else if (isThread) {
         // ===== FORMAT TWITTER/X THREAD =====
-        p += `Konten berbentuk THREAD. Gunakan format TABEL berikut:\n\n`;
+        p += `[5. FORMAT OUTPUT - WAJIB GUNAKAN TABEL]\n`;
+        p += `Sajikan output dalam format TABEL MARKDOWN yang rapih agar mudah dibaca dan di-copy.\n\n`;
         p += `**Variasi [No]: [Judul Thread]**\n`;
         p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
         p += `| Tweet No | Konten Tweet (Max 280 Karakter) |\n`;
@@ -1762,38 +2246,70 @@ function generatePrompt() {
         p += `----------------------------------\n`;
 
     } else if (isStaticImage) {
-        // ===== FORMAT SINGLE IMAGE =====
-        p += `Konten berbentuk IMAGE + CAPTION. Gunakan format TABEL berikut:\n\n`;
-        p += `**Variasi [No]: [Judul]**\n`;
-        p += `*Hook Strategy: [Taktik visual hook]*\n\n`;
-        p += `| Elemen | Detail |\n`;
-        p += `|---|---|\n`;
-        p += `| **Visual Utama** | [Deskripsi foto/gambar utama: objek, angle, lighting, mood] |\n`;
-        p += `| **Teks Overlay** | "[Text yang ada di gambar - harus eye-catching & readable]" |\n`;
-        p += `| **Caption** | "[Caption panjang dengan hook + value + CTA - bisa 300+ kata]" |\n`;
-        p += `| **Hashtag** | [5-10 hashtag relevant dipisahkan spasi] |\n`;
+        // ===== FORMAT SINGLE IMAGE (HEADING) =====
+        p += `[5. FORMAT OUTPUT - HEADING & PARAGRAF]\n`;
+        p += `DILARANG menggunakan format Tabel. Gunakan format Heading dan Paragraf.\n\n`;
+        p += `---\n\n`;
+        p += `## 🖼️ SINGLE IMAGE: [Judul yang Menarik]\n`;
+        p += `*Hook Strategy:* [Taktik visual hook]\n\n`;
+        p += `### Visual Utama\n`;
+        p += `[Deskripsikan foto/gambar utama secara detail: objek apa, angle kamera, lighting, mood/warna yang dominan, komposisi]\n\n`;
+        p += `### Teks Overlay\n`;
+        p += `"[Tulis teks yang akan ada di gambar - harus eye-catching, readable, dan maksimal 10 kata]\n\n`;
+        p += `### Caption\n`;
+        p += `[Tulis caption panjang MINIMAL 3 paragraf. SETIAP paragraf WAJIB berisi minimal 3-4 kalimat yang substansial. Paragraf 1: Hook/keresahan yang relate dengan audiens. Paragraf 2: Value/tips tambahan yang TIDAK ADA di gambar (jelaskan lebih dalam). Paragraf 3: CTA yang jelas dan spesifik.]\n\n`;
+        p += `### Hashtag\n`;
+        p += `[5-10 hashtag relevant dipisahkan spasi]\n\n`;
         p += `----------------------------------\n`;
-   
+
     } else {
-        // ===== FORMAT VIDEO (DEFAULT) =====
-        p += `Konten berbentuk VIDEO. Gunakan format TABEL berikut:\n\n`;
-        p += `**Variasi [No]: [Judul Angle]**\n`;
-        p += `*Hook Strategy: [Sebutkan taktik hook yang dipilih]*\n\n`;
-        p += `| Section | Visual (Adegan/Gerakan Kamera) | Audio (Naskah Spoken-Word) | Durasi Est. |\n`;
-        p += `|---|---|---|:---:|\n`;
-        p += `| **HOOK** | [Deskripsi detail adegan pembuka yang menarik] | "[Naskah hook - langsung ke poin, harus stop scroll!]" | 3-5 detik |\n`;
-        p += `| **[STEP 1 FW]** | [Visual step 1 sesuai framework] | "[Naskah step 1 - SESUAIKAN DENGAN INSTRUKSI FRAMEWORK]" | Sesuaikan |\n`;
-        p += `| **[STEP 2 FW]** | [Visual step 2 sesuai framework] | "[Naskah step 2 - SESUAIKAN DENGAN INSTRUKSI FRAMEWORK]" | Sesuaikan |\n`;
-        p += `| **[STEP N FW]** | [Visual step selanjutnya jika ada] | "[Naskah step selanjutnya]" | Sesuaikan |\n`;
-        p += `| **CTA** | [Deskripsi adegan penutup/gesture menunjuk link/arah] | "[Naskah CTA - ajakan action jelas & tegas]" | 5 detik |\n\n`;
-        p += `**CATATAN PENTING:**\n`;
-        p += `- JANGAN gunakan baris "BODY" generik.\n`;
-        p += `- Ganti "[STEP 1 FW]", "[STEP 2 FW]", dst dengan NAMA LANGKAH dari FRAMEWORK yang dipilih.\n`;
-        p += `- Contoh: Kalau framework ABT, barisnya harus: FACT, BUT, THEREFORE.\n`;
-        p += `- Contoh: Kalau framework PAS, barisnya harus: PROBLEM, AGITATE, SOLUTION.\n\n`;
-        p += `**Caption:** [Copywriting singkat untuk deskripsi video]\n`;
-        p += `**Hashtag:** [3-5 hashtag relevant]\n`;
+        // ===== FORMAT VIDEO (HEADING - UNTUK SEMUA DURASI) =====
+        p += `[5. FORMAT OUTPUT - HEADING & PARAGRAF]\n`;
+        p += `DILARANG KERAS menggunakan format Tabel Markdown. Tabel memaksa AI memotong kalimat jadi pendek. Gunakan format Heading dan Paragraf agar naskah bisa ditulis secara utuh dan mengalir natural.\n\n`;
+        p += `Berikut template output yang WAJIB kamu ikuti:\n\n`;
+        p += `---\n\n`;
+        p += `## 🎬 SCRIPT VARIASI [No]: [Judul Angle yang Menarik]\n`;
+        p += `*Hook Strategy:* [Sebutkan taktik hook yang dipilih]\n`;
+        p += `*Framework:* [Sebutkan framework yang dipilih]\n\n`;
+        p += `### [HOOK] (3-5 detik)\n`;
+        p += `**Visual:** [Deskripsikan adegan pembuka secara detail - gerakan kamera, ekspresi, prop, lighting]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah hook di sini - langsung to the point, harus membuat orang berhenti scroll. Gunakan kalimat pembuka yang kontroversial, shocking, atau sangat relate.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 1 DARI FRAMEWORK]\n`;
+        p += `**Visual:** [Deskripsikan adegan untuk step pertama framework]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 1 sesuai instruksi framework. Elaborasikan dengan detail. Tulis dalam paragraf utuh yang mengalir natural.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 2 DARI FRAMEWORK]\n`;
+        p += `**Visual:** [Deskripsikan adegan untuk step kedua framework]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 2 sesuai instruksi framework. Elaborasikan.]\n\n`;
+        p += `---\n\n`;
+        p += `### [NAMA STEP 3 DARI FRAMEWORK] (jika ada)\n`;
+        p += `**Visual:** [Deskripsikan adegan]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah step 3. Elaborasikan.]\n\n`;
+        p += `---\n\n`;
+        p += `(Lanjutkan step-step selanjutnya sesuai framework hingga selesai...)\n\n`;
+        p += `---\n\n`;
+        p += `### [CTA] (5 detik)\n`;
+        p += `**Visual:** [Deskripsikan adegan penutup - gesture menunjuk link, zoom in, dll]\n\n`;
+        p += `**Narasi:**\n`;
+        p += `"[Tulis naskah CTA yang jelas, tegas, dan direct.]\n\n`;
+        p += `---\n\n`;
+        p += `## 📝 CAPTION\n`;
+        p += `[Tulis caption panjang MINIMAL 3 paragraf. SETIAP paragraf WAJIB berisi minimal 3-4 kalimat yang substansial. Paragraf 1: Hook/keresahan yang relate dengan audiens. Paragraf 2: Value tambahan yang TIDAK ADA di video (jelaskan lebih dalam, beri insight baru yang memperkuat pesan). Paragraf 3: CTA yang jelas dan spesifik.]\n\n`;
+        p += `## # HASHTAG\n`;
+        p += `[3-5 hashtag relevant]\n\n`;
         p += `----------------------------------\n`;
+        p += `⚠️ CATATAN PENTING:\n`;
+        p += `- JANGAN gunakan baris "BODY" generik.\n`;
+        p += `- Ganti "[NAMA STEP 1 DARI FRAMEWORK]", "[NAMA STEP 2 DARI FRAMEWORK]", dst dengan NAMA LANGKAH dari FRAMEWORK yang dipilih.\n`;
+        p += `- Contoh: Kalau framework ABT, heading-nya harus: FACT, BUT, THEREFORE.\n`;
+        p += `- Contoh: Kalau framework PAS, heading-nya harus: PROBLEM, AGITATE, SOLUTION.\n`;
+        p += `- Setiap section narasi HARUS berupa paragraf utuh, bukan poin-poin singkat.\n`;
+        p += `- Jika diminta lebih dari 1 variasi, ulangi template di atas untuk setiap variasi.\n\n`;
     }
 
     return p;
@@ -1825,7 +2341,7 @@ function copyPrompt() {
         }, 2000);
     }).catch(err => {
         console.error('Gagal menyalin: ', err);
-        alert("Gagal menyalin prompt. Silakan coba lagi.");
+        showToast('error', 'Gagal Menyalin', 'Silakan coba lagi atau salin manual.');
     });
 }
 
@@ -1923,37 +2439,144 @@ function closeInfoModal(event) {
 }
 
 // ========================================
+// TOAST NOTIFICATION
+// ========================================
+function showToast(type, title, message, duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const card = document.getElementById('toastCard');
+    const icon = document.getElementById('toastIcon');
+    const titleEl = document.getElementById('toastTitle');
+    const messageEl = document.getElementById('toastMessage');
+    const progressBar = document.getElementById('toastProgressBar');
+
+    // Reset
+    container.classList.remove('show');
+    card.classList.remove('toast-exit');
+
+    // Set content
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    // Set icon
+    if (type === 'error') {
+        icon.className = 'toast-icon error';
+        icon.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        progressBar.className = 'toast-progress-bar error';
+    } else if (type === 'info') {
+        icon.className = 'toast-icon';
+        icon.style.background = 'linear-gradient(135deg, #DBEAFE, #BFDBFE)';
+        icon.style.color = '#2563EB';
+        icon.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        progressBar.className = 'toast-progress-bar';
+        progressBar.style.background = 'linear-gradient(90deg, #3B82F6, #60A5FA)';
+    } else {
+        icon.className = 'toast-icon success';
+        icon.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        progressBar.className = 'toast-progress-bar success';
+    }
+
+    // Reset progress bar
+    progressBar.style.transition = 'none';
+    progressBar.style.width = '100%';
+
+    // Show
+    requestAnimationFrame(() => {
+        container.classList.add('show');
+        requestAnimationFrame(() => {
+            progressBar.style.transition = 'width ' + duration + 'ms linear';
+            progressBar.style.width = '0%';
+        });
+    });
+
+    // Auto hide
+    setTimeout(() => {
+        card.classList.add('toast-exit');
+        setTimeout(() => {
+            container.classList.remove('show');
+            card.classList.remove('toast-exit');
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '100%';
+        }, 300);
+    }, duration);
+}
+
+// ========================================
 // LOGOUT
 // ========================================
 function logout() {
-    alert("Logout berhasil!");
-    // window.location.href = 'login.html';
+    const modal = document.getElementById('logoutModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
+
+function closeLogoutModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('logoutModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+async function executeLogout() {
+    isLoggingOut = true;
+
+    if (sessionUnsubscribe) {
+        sessionUnsubscribe();
+        sessionUnsubscribe = null;
+    }
+
+    try {
+        const user = firebase.auth().currentUser;
+        if (user && typeof firebase.firestore === 'function') {
+            const db = firebase.firestore();
+            const deviceId = getOrCreateDeviceId();
+            db.collection('sessions').doc(`${user.uid}_${deviceId}`).delete().catch(function(){});
+        }
+        await firebase.auth().signOut();
+    } catch (e) {
+        // Abaikan error, tetap redirect
+    }
+
+    window.location.href = 'login.html';
+}
+
+firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+        window.location.href = 'login.html';
+    } else {
+        initializeApp();
+    }
+});
 
 // ========================================
 // INITIALIZATION: TAMPILKAN PLACEHOLDER SAAT LOAD
 // ========================================
 function initializeApp() {
-    // Render Section 2 - 6 dalam mode "waiting" atau default
-    renderSection2();
-    renderSection3();
-    renderSection4();
-    renderSection5();
-    renderSection6();
-    renderFinalAction();
-    
-    // Tampilkan placeholder di preview saat load
+    const saved = loadStateFromStorage();
+
+    if (saved && saved.masterFilter) {
+        const fullState = JSON.parse(JSON.stringify(saved));
+        selectMasterFilter(fullState.masterFilter);
+        Object.assign(appState, fullState);
+        restoreInputValues();
+    } else {
+        renderSection2();
+        renderSection3();
+        renderSection4();
+        renderSection5();
+        renderSection6();
+        renderFinalAction();
+    }
+
     const previewContainer = document.getElementById('previewContainer');
-    if(previewContainer) {
+    if (previewContainer) {
         showPreviewPlaceholder(previewContainer);
     }
-    
-    // Initialize progress bar
+
     initProgressBar();
+    startInactivityTimer();
+    manageSession();
 }
 
-// Jalankan saat halaman dimuat
-window.onload = initializeApp;
 // ========================================
 // PROGRESS BAR FUNCTIONS (OFFER 2)
 // ========================================
