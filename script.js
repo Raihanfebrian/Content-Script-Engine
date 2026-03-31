@@ -974,7 +974,12 @@ async function manageSession() {
         console.log('[Session] Active session:', sessionRef.id);
         startSessionWatch(user.uid, deviceId);
     } catch (e) {
-        console.error('[Session] GAGAL:', e.message);
+        console.error('========================================');
+        console.error('[Session] GAGAL! Kemungkinan besar masalah di Firestore Security Rules.');
+        console.error('[Session] Error:', e.code, '-', e.message);
+        console.error('[Session] Pastikan collection "sessions" punya rule CREATE yang terpisah dari READ.');
+        console.error('[Session] Lihat panduan rules di dokumentasi kode.');
+        console.error('========================================');
     }
 }
 
@@ -984,14 +989,17 @@ function startSessionWatch(uid, deviceId) {
     const db = firebase.firestore();
     const sessionRef = db.collection('sessions').doc(`${uid}_${deviceId}`);
 
+    // 1. Real-time listener (instant di kondisi normal)
     sessionUnsubscribe = sessionRef.onSnapshot((doc) => {
         if (!doc.exists && !isLoggingOut) {
+            isLoggingOut = true;
             alert("Akun Anda digunakan di perangkat lain. Anda telah keluar otomatis.");
             firebase.auth().signOut();
             window.location.href = 'login.html';
         }
     });
 
+    // 2. Heartbeat (update lastActive setiap 30 detik)
     setInterval(async () => {
         try {
             await sessionRef.update({
@@ -999,6 +1007,24 @@ function startSessionWatch(uid, deviceId) {
             });
         } catch (e) { console.warn('[Session] Heartbeat gagal:', e.message); }
     }, 30000);
+
+    // 3. FALLBACK: Polling cek keberadaan session setiap 10 detik
+    // Menangkap kasus dimana onSnapshot tidak memicu karena WebSocket masih hidup
+    // tapi token sudah di-revoke setelah ganti password
+    setInterval(async () => {
+        if (isLoggingOut) return;
+        try {
+            const doc = await sessionRef.get();
+            if (!doc.exists) {
+                isLoggingOut = true;
+                alert("Akun Anda digunakan di perangkat lain. Anda telah keluar otomatis.");
+                await firebase.auth().signOut();
+                window.location.href = 'login.html';
+            }
+        } catch (e) {
+            console.warn('[Session] Fallback check gagal:', e.message);
+        }
+    }, 10000);
 }
 
 // ========================================
