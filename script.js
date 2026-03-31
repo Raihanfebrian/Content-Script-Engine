@@ -932,17 +932,35 @@ async function manageSession() {
     const sessionRef = db.collection('sessions').doc(`${user.uid}_${deviceId}`);
 
     try {
+        // HAPUS orderBy dari query -> hindari kebutuhan composite index
         const snapshot = await db.collection('sessions')
             .where('uid', '==', user.uid)
-            .orderBy('lastActive', 'asc')
             .get();
 
-        if (snapshot.size >= 2) {
-            for (const doc of snapshot.docs) {
-                if (doc.id !== sessionRef.id) {
-                    await doc.ref.delete();
-                    break;
+        // Sort di client-side berdasarkan lastActive (tidak butuh index)
+        const docs = snapshot.docs.sort((a, b) => {
+            const aTime = a.data().lastActive ? (a.data().lastActive.toMillis ? a.data().lastActive.toMillis() : 0) : 0;
+            const bTime = b.data().lastActive ? (b.data().lastActive.toMillis ? b.data().lastActive.toMillis() : 0) : 0;
+            return aTime - bTime;
+        });
+
+        const mySessionExists = docs.some(doc => doc.id === sessionRef.id);
+
+        if (mySessionExists) {
+            // Session sendiri sudah ada (refresh/re-login) -> hanya hapus kalau total > 2
+            if (docs.length > 2) {
+                const othersSorted = docs.filter(d => d.id !== sessionRef.id);
+                if (othersSorted.length > 0) {
+                    await othersSorted[0].ref.delete();
+                    console.log('[Session] Kicked oldest device:', othersSorted[0].id);
                 }
+            }
+        } else {
+            // Session sendiri belum ada (login baru di perangkat baru)
+            // Kalau sudah ada 2 perangkat lain, hapus yang paling lama
+            if (docs.length >= 2) {
+                await docs[0].ref.delete();
+                console.log('[Session] Kicked oldest device:', docs[0].id);
             }
         }
 
@@ -953,9 +971,10 @@ async function manageSession() {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
+        console.log('[Session] Active session:', sessionRef.id);
         startSessionWatch(user.uid, deviceId);
     } catch (e) {
-        console.error('Session management error:', e);
+        console.error('[Session] GAGAL:', e.message);
     }
 }
 
@@ -978,8 +997,8 @@ function startSessionWatch(uid, deviceId) {
             await sessionRef.update({
                 lastActive: firebase.firestore.FieldValue.serverTimestamp()
             });
-        } catch (e) { /* ignore */ }
-    }, 60000);
+        } catch (e) { console.warn('[Session] Heartbeat gagal:', e.message); }
+    }, 30000);
 }
 
 // ========================================
@@ -996,8 +1015,9 @@ function startInactivityTimer() {
         const last = parseInt(localStorage.getItem('scriptEngineLastActivity') || '0');
         if (Date.now() - last > LIMIT) {
             isLoggingOut = true;
-            firebase.auth().signOut();
-            window.location.href = 'login.html';
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
         }
     }
 
@@ -1005,8 +1025,16 @@ function startInactivityTimer() {
         document.addEventListener(evt, updateActivity, { passive: true });
     });
 
+    // TAMBAHAN: Cek saat tab kembali aktif (browser pause timer di background tab)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            checkInactivity();
+        }
+    });
+
     updateActivity();
     setInterval(checkInactivity, 60000);
+    checkInactivity(); // Cek sekali saat pertama kali load
 }
 
 
@@ -1144,7 +1172,7 @@ function createSelectField(id, label, tooltipText, options, useModal = false) {
                 ${optionsHtml}
             </select>
             <div id="manual-${id}" class="hidden mt-2">
-                <input type="text" class="manual-input" placeholder="Tulis manual di sini..." oninput="appState.${id} = this.value">
+                <input type="text" class="manual-input" placeholder="Tulis manual di sini..." oninput="handleManualInput('${id}', this.value)">
             </div>
         </div>
     `;
@@ -1259,6 +1287,9 @@ function renderSection2() {
                         <option value="" disabled selected>${jenisKontenDisabled ? 'Pilih tipe konten di Section 1 dulu' : 'Pilih salah satu...'}</option>
                         ${!jenisKontenDisabled ? jenisKontenOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('') : ''}
                     </select>
+                    <div id="manual-jenisKonten" class="hidden mt-2">
+                        <input type="text" class="manual-input" placeholder="Tulis manual di sini..." oninput="handleManualInput('jenisKonten', this.value)">
+                    </div>
                 </div>
 
                 <!-- 2. Format & Durasi (Universal) -->
@@ -1498,6 +1529,11 @@ function handleTextInput(id, value) {
     saveStateToStorage();
 }
 
+// Handler khusus untuk Manual Input (Lainnya)
+function handleManualInput(id, value) {
+    appState[id] = value;
+    saveStateToStorage(); // ← INI yang hilang di kode lama
+}
 // ========================================
 // RENDER SECTION 5 (DETAIL PRODUK / KONTEKS)
 // ========================================
@@ -2518,7 +2554,9 @@ function openChangePasswordModal() {
 }
 
 function closeChangePasswordModal(e) {
-    if (e && e.target !== e.currentTarget) return;
+    // Hanya cek klik overlay (bukan tombol X atau pemanggilan dari JS)
+    // e.currentTarget hanya ada pada event DOM asli, bukan objek palsu
+    if (e && e.currentTarget && e.target !== e.currentTarget) return;
     const modal = document.getElementById('changePasswordModal');
     modal.classList.remove('active');
     document.body.style.overflow = '';
@@ -2568,15 +2606,37 @@ async function executeChangePassword() {
     const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
     
     try {
-        // 1. Re-authenticate dulu dengan password lama
         await user.reauthenticateWithCredential(credential);
-        
-        // 2. Update password
         await user.updatePassword(newPass);
         
-        // 3. Success - tutup modal
-        closeChangePasswordModal({ target: document.getElementById('changePasswordModal') });
-        showToast('success', 'Password Berhasil Diubah', 'Password akun kamu sudah diperbarui.');
+        // KICK semua session lain kecuali yang sekarang
+        try {
+            const db = firebase.firestore();
+            const deviceId = getOrCreateDeviceId();
+            const mySessionId = `${user.uid}_${deviceId}`;
+            
+            const snapshot = await db.collection('sessions')
+                .where('uid', '==', user.uid)
+                .get();
+            
+            // Gunakan batch write untuk efisien
+            if (!snapshot.empty) {
+                const batch = db.batch();
+                snapshot.docs.forEach(doc => {
+                    if (doc.id !== mySessionId) {
+                        batch.delete(doc.ref);
+                    }
+                });
+                await batch.commit();
+                console.log('[Session] Kicked all other devices after password change.');
+            }
+        } catch (sessionErr) {
+            // Jangan gagalkan proses ganti password kalau kick session gagal
+            console.warn('[Session] Gagal kick sesi lain:', sessionErr.message);
+        }
+        
+        closeChangePasswordModal();
+        showToast('success', 'Password Berhasil Diubah', 'Password akun kamu sudah diperbarui. Semua perangkat lain telah logout otomatis.');
         
     } catch (err) {
         errorBox.style.display = 'flex';
@@ -2662,6 +2722,7 @@ function initializeApp() {
         selectMasterFilter(fullState.masterFilter);
         Object.assign(appState, fullState);
         restoreInputValues();
+        saveStateToStorage(); // ← TAMBAHKAN INI
     } else {
         renderSection2();
         renderSection3();
@@ -2733,21 +2794,18 @@ function isSectionComplete(sectionNum) {
 function updateProgressBar() {
     const totalSteps = 6;
     let completedSteps = 0;
-    let currentActiveStep = 0;
+    let foundActive = false; // ← GANTI: pakai boolean flag
     
-    // Cek setiap section
     for (let i = 1; i <= totalSteps; i++) {
         const dot = document.getElementById(`progress-dot-${i}`);
         const label = dot?.parentElement?.querySelector('.progress-label');
         const isComplete = isSectionComplete(i);
         
         if (dot) {
-            // Reset classes
             dot.classList.remove('active', 'completed');
             if (label) label.classList.remove('active', 'completed');
             
             if (isComplete) {
-                // Section sudah complete
                 dot.classList.add('completed');
                 dot.innerHTML = `
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2756,15 +2814,12 @@ function updateProgressBar() {
                 `;
                 if (label) label.classList.add('completed');
                 completedSteps++;
-                currentActiveStep = i;
-            } else if (currentActiveStep === 0 || currentActiveStep === i - 1) {
-                // Section yang sedang aktif (pertama yang belum complete)
+            } else if (!foundActive) {
                 dot.classList.add('active');
                 dot.innerHTML = i;
                 if (label) label.classList.add('active');
-                currentActiveStep = i;
+                foundActive = true;
             } else {
-                // Section yang belum sampai
                 dot.innerHTML = i;
             }
         }
@@ -2773,7 +2828,6 @@ function updateProgressBar() {
     // Update garis progress
     const progressLine = document.getElementById('progressLineActive');
     if (progressLine) {
-        // Hitung persentase progress
         const percentage = ((completedSteps / totalSteps) * 100);
         progressLine.style.width = `${percentage}%`;
     }

@@ -870,7 +870,25 @@ textarea.input-text-field {
     }
 }
 
+@media (max-width: 640px) {
+    .progress-bar-container {
+        top: 60px;
+        padding: 10px 12px;
+    }
+    
+    .progress-dot {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+    }
+}
+
 @media (max-width: 480px) {
+    .progress-bar-container {
+        top: 57px;
+        padding: 8px 10px;
+    }
+    
     .progress-label {
         display: none;
     }
