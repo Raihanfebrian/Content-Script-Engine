@@ -932,53 +932,56 @@ async function manageSession() {
     const sessionRef = db.collection('sessions').doc(`${user.uid}_${deviceId}`);
 
     try {
-        // HAPUS orderBy dari query -> hindari kebutuhan composite index
         const snapshot = await db.collection('sessions')
             .where('uid', '==', user.uid)
             .get();
 
-        // Sort di client-side berdasarkan lastActive (tidak butuh index)
+        // FIX 1: Sortir berdasarkan 'createdAt' untuk nyari device yang PALING LAMA (pertama) login
         const docs = snapshot.docs.sort((a, b) => {
-            const aTime = a.data().lastActive ? (a.data().lastActive.toMillis ? a.data().lastActive.toMillis() : 0) : 0;
-            const bTime = b.data().lastActive ? (b.data().lastActive.toMillis ? b.data().lastActive.toMillis() : 0) : 0;
-            return aTime - bTime;
+            // Helper untuk cegah error kalau timestamp masih pending dari server
+            const getMillis = (ts) => ts ? (typeof ts.toMillis === 'function' ? ts.toMillis() : Date.now()) : 0;
+            return getMillis(a.data().createdAt) - getMillis(b.data().createdAt);
         });
 
         const mySessionExists = docs.some(doc => doc.id === sessionRef.id);
 
         if (mySessionExists) {
-            // Session sendiri sudah ada (refresh/re-login) -> hanya hapus kalau total > 2
+            // Session sendiri sudah ada (kasus refresh web)
             if (docs.length > 2) {
                 const othersSorted = docs.filter(d => d.id !== sessionRef.id);
+                // Tendang device paling tua (index 0)
                 if (othersSorted.length > 0) {
                     await othersSorted[0].ref.delete();
                     console.log('[Session] Kicked oldest device:', othersSorted[0].id);
                 }
             }
         } else {
-            // Session sendiri belum ada (login baru di perangkat baru)
-            // Kalau sudah ada 2 perangkat lain, hapus yang paling lama
+            // Session BARU (Device ke-3 login)
             if (docs.length >= 2) {
+                // Karena udah di-sortir dari yang paling lama, docs[0] PASTI device pertama
                 await docs[0].ref.delete();
                 console.log('[Session] Kicked oldest device:', docs[0].id);
             }
         }
 
-        await sessionRef.set({
+        // FIX 2: Jangan overwrite createdAt kalau sessionnya emang udah pernah dibuat
+        const sessionData = {
             uid: user.uid,
             deviceId: deviceId,
-            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (!mySessionExists) {
+            sessionData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+
+        await sessionRef.set(sessionData, { merge: true });
 
         console.log('[Session] Active session:', sessionRef.id);
         startSessionWatch(user.uid, deviceId);
     } catch (e) {
         console.error('========================================');
-        console.error('[Session] GAGAL! Kemungkinan besar masalah di Firestore Security Rules.');
-        console.error('[Session] Error:', e.code, '-', e.message);
-        console.error('[Session] Pastikan collection "sessions" punya rule CREATE yang terpisah dari READ.');
-        console.error('[Session] Lihat panduan rules di dokumentasi kode.');
+        console.error('[Session] GAGAL!', e.message);
         console.error('========================================');
     }
 }
