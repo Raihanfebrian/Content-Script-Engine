@@ -862,17 +862,7 @@ function clearStateStorage() {
     localStorage.removeItem('scriptEngineState');
 }
 
-// ========================================
-// DEVICE ID
-// ========================================
-function getOrCreateDeviceId() {
-    let deviceId = localStorage.getItem('scriptEngineDeviceId');
-    if (!deviceId) {
-        deviceId = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('scriptEngineDeviceId', deviceId);
-    }
-    return deviceId;
-}
+
 
 // ========================================
 // RESTORE INPUT VALUES (SETELAH RENDER DOM)
@@ -918,135 +908,243 @@ function restoreInputValues() {
 }
 
 // ========================================
-// SESSION MANAGEMENT (MAX 2 DEVICE)
+// SESSION & ACCESS CONFIG
 // ========================================
-let isLoggingOut = false;
+const MAX_DEVICES = 2;
+const SESSION_TIMEOUT_MS = 12 * 60 * 60 * 1000; // 12 jam
 let sessionUnsubscribe = null;
 
-async function manageSession() {
-    const user = firebase.auth().currentUser;
-    if (!user) return;
+// ========================================
+// SESSION MANAGEMENT (ADAPTASI DARI LANDING PAGE ENGINE)
+// ========================================
+function generateSessionId() {
+    return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
-    const db = firebase.firestore();
-    const deviceId = getOrCreateDeviceId();
-    const sessionRef = db.collection('sessions').doc(`${user.uid}_${deviceId}`);
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let device = 'Desktop';
+    if (/mobile/i.test(ua)) device = 'Mobile';
+    else if (/tablet/i.test(ua)) device = 'Tablet';
+    
+    let browser = 'Unknown';
+    if (/chrome/i.test(ua) && !/edge|opr/i.test(ua)) browser = 'Chrome';
+    else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = 'Safari';
+    else if (/firefox/i.test(ua)) browser = 'Firefox';
+    else if (/edge/i.test(ua)) browser = 'Edge';
+    
+    return device + ' - ' + browser;
+}
 
+async function createSession(user) {
     try {
-        const snapshot = await db.collection('sessions')
-            .where('uid', '==', user.uid)
-            .get();
+        const db = firebase.firestore();
+        const sessionId = generateSessionId();
+        
+        localStorage.setItem('sessionId', sessionId);
+        localStorage.setItem('lastActivity', Date.now().toString());
+        
+        await db.collection('sessions').doc(sessionId).set({
+            uid: user.uid,
+            email: user.email,
+            deviceInfo: getDeviceInfo(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
+            isActive: true
+        });
+        
+        // Invalidate session lama kalau melebihi batas
+        await invalidateOldSessions(user.uid, sessionId);
+        
+        console.log('[Session] Created:', sessionId);
+        return sessionId;
+    } catch (error) {
+        console.error('[Session] Create error:', error);
+        return null;
+    }
+}
 
-        // FIX 1: Sortir berdasarkan 'createdAt' untuk nyari device yang PALING LAMA (pertama) login
+async function invalidateOldSessions(userId, currentSessionId) {
+    try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('sessions')
+            .where('uid', '==', userId)
+            .where('isActive', '==', true)
+            .get();
+        
+        // Sort: paling lama di index 0
         const docs = snapshot.docs.sort((a, b) => {
-            // Helper untuk cegah error kalau timestamp masih pending dari server
             const getMillis = (ts) => ts ? (typeof ts.toMillis === 'function' ? ts.toMillis() : Date.now()) : 0;
             return getMillis(a.data().createdAt) - getMillis(b.data().createdAt);
         });
-
-        const mySessionExists = docs.some(doc => doc.id === sessionRef.id);
-
-        if (mySessionExists) {
-            // Session sendiri sudah ada (kasus refresh web)
-            if (docs.length > 2) {
-                const othersSorted = docs.filter(d => d.id !== sessionRef.id);
-                // Tendang device paling tua (index 0)
-                if (othersSorted.length > 0) {
-                    await othersSorted[0].ref.delete();
-                    console.log('[Session] Kicked oldest device:', othersSorted[0].id);
-                }
-            }
-        } else {
-            // Session BARU (Device ke-3 login)
-            if (docs.length >= 2) {
-                // Karena udah di-sortir dari yang paling lama, docs[0] PASTI device pertama
-                await docs[0].ref.delete();
-                console.log('[Session] Kicked oldest device:', docs[0].id);
-            }
+        
+        const others = docs.filter(d => d.id !== currentSessionId);
+        
+        // Selama total session (termasuk baru) > MAX_DEVICES, tendang yang paling lama
+        while ((others.length + 1) > MAX_DEVICES && others.length > 0) {
+            const oldest = others.shift();
+            await oldest.ref.update({
+                isActive: false,
+                invalidatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                invalidationReason: 'Login dari device baru'
+            });
+            console.log('[Session] Kicked:', oldest.id, '| Device:', oldest.data().deviceInfo);
         }
-
-        // FIX 2: Jangan overwrite createdAt kalau sessionnya emang udah pernah dibuat
-        const sessionData = {
-            uid: user.uid,
-            deviceId: deviceId,
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        if (!mySessionExists) {
-            sessionData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        }
-
-        await sessionRef.set(sessionData, { merge: true });
-
-        console.log('[Session] Active session:', sessionRef.id);
-        startSessionWatch(user.uid, deviceId);
-    } catch (e) {
-        console.error('========================================');
-        console.error('[Session] GAGAL!', e.message);
-        console.error('========================================');
+    } catch (error) {
+        console.error('[Session] Invalidate error:', error);
     }
 }
 
-function startSessionWatch(uid, deviceId) {
-    if (sessionUnsubscribe) sessionUnsubscribe();
-
-    const db = firebase.firestore();
-    const sessionRef = db.collection('sessions').doc(`${uid}_${deviceId}`);
-
-    // 1. Real-time listener (instant di kondisi normal)
-    sessionUnsubscribe = sessionRef.onSnapshot((doc) => {
-        if (!doc.exists && !isLoggingOut) {
-            isLoggingOut = true;
-            alert("Akun Anda digunakan di perangkat lain. Anda telah keluar otomatis.");
-            firebase.auth().signOut();
-            window.location.href = 'login.html';
-        }
-    });
-
-    // 2. Heartbeat (update lastActive setiap 30 detik)
-    setInterval(async () => {
-        try {
-            await sessionRef.update({
-                lastActive: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } catch (e) { console.warn('[Session] Heartbeat gagal:', e.message); }
-    }, 30000);
-
-    // 3. FALLBACK: Polling cek keberadaan session setiap 10 detik
-    // Menangkap kasus dimana onSnapshot tidak memicu karena WebSocket masih hidup
-    // tapi token sudah di-revoke setelah ganti password
-    setInterval(async () => {
-        if (isLoggingOut) return;
-        try {
-            const doc = await sessionRef.get();
-            if (!doc.exists) {
-                isLoggingOut = true;
-                alert("Akun Anda digunakan di perangkat lain. Anda telah keluar otomatis.");
-                await firebase.auth().signOut();
-                window.location.href = 'login.html';
+async function validateSession(user) {
+    try {
+        const sessionId = localStorage.getItem('sessionId');
+        const lastActivity = localStorage.getItem('lastActivity');
+        
+        // Cek timeout lokal
+        if (lastActivity) {
+            const elapsed = Date.now() - parseInt(lastActivity);
+            if (elapsed > SESSION_TIMEOUT_MS) {
+                return { valid: false, reason: 'timeout' };
             }
-        } catch (e) {
-            console.warn('[Session] Fallback check gagal:', e.message);
         }
-    }, 10000);
+        
+        localStorage.setItem('lastActivity', Date.now().toString());
+        
+        if (!sessionId) return { valid: false, reason: 'no_session' };
+        
+        const db = firebase.firestore();
+        const sessionDoc = await db.collection('sessions').doc(sessionId).get();
+        
+        if (!sessionDoc.exists) return { valid: false, reason: 'not_found' };
+        
+        const data = sessionDoc.data();
+        if (!data.isActive) return { valid: false, reason: 'logged_elsewhere' };
+        if (data.uid !== user.uid) return { valid: false, reason: 'mismatch' };
+        
+        // Update last active ke server
+        sessionDoc.ref.update({
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function() {});
+        
+        return { valid: true };
+    } catch (error) {
+        console.error('[Session] Validate error:', error);
+        return { valid: true }; // Fail-open: jangan block kalau Firestore error sesaat
+    }
+}
+
+function startSessionListener(user) {
+    const sessionId = localStorage.getItem('sessionId');
+    if (!sessionId) return;
+    
+    if (sessionUnsubscribe) sessionUnsubscribe();
+    
+    const db = firebase.firestore();
+    sessionUnsubscribe = db.collection('sessions').doc(sessionId)
+        .onSnapshot(function(doc) {
+            if (!doc.exists) {
+                forceLogout('Sesi Anda telah dihapus oleh sistem.');
+                return;
+            }
+            
+            const data = doc.data();
+            if (!data.isActive) {
+                let reason = 'Akun Anda login di perangkat lain. (Maksimal 2 device)';
+                if (data.invalidationReason === 'Password changed') {
+                    reason = 'Password telah diubah. Silakan login kembali.';
+                }
+                forceLogout(reason);
+            }
+        }, function(error) {
+            console.error('[Session] Listener error:', error);
+        });
+}
+
+function stopSessionListener() {
+    if (sessionUnsubscribe) {
+        sessionUnsubscribe();
+        sessionUnsubscribe = null;
+    }
+}
+
+function forceLogout(reason) {
+    stopSessionListener();
+    
+    firebase.auth().signOut().then(function() {
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('lastActivity');
+        alert(reason);
+        window.location.href = 'login.html';
+    }).catch(function() {
+        window.location.href = 'login.html';
+    });
+}
+
+async function clearCurrentSession() {
+    try {
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+            const db = firebase.firestore();
+            await db.collection('sessions').doc(sessionId).update({
+                isActive: false,
+                loggedOutAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(function() {});
+        }
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('lastActivity');
+    } catch (error) {
+        console.error('[Session] Clear error:', error);
+    }
 }
 
 // ========================================
-// AUTO LOGOUT (12 JAM INAKTIF)
+// WHITELIST CHECK (ADAPTASI DARI LANDING PAGE ENGINE)
 // ========================================
+async function checkAccess(user) {
+    try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('subscriptions')
+            .where('email', '==', user.email)
+            .where('isActive', '==', true)
+            .limit(1)
+            .get();
+        
+        if (snapshot.empty) {
+            // Cek apakah email pernah terdaftar tapi non-aktif
+            const allSnap = await db.collection('subscriptions')
+                .where('email', '==', user.email)
+                .limit(1)
+                .get();
+            
+            if (!allSnap.empty) {
+                await firebase.auth().signOut();
+                alert('⚠️ Akses Ditolak!\n\nAkun Anda tidak aktif. Hubungi admin.');
+            } else {
+                await firebase.auth().signOut();
+                alert('⚠️ Akses Ditolak!\n\nEmail ini belum terdaftar. Hubungi admin untuk mendapatkan akses.');
+            }
+            setTimeout(function() { window.location.href = 'login.html'; }, 500);
+            return false;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('[Access] Check error:', error);
+        return true; // Fail-open
+    }
+}
+
 function startInactivityTimer() {
-    const LIMIT = 12 * 60 * 60 * 1000;
+    const LIMIT = SESSION_TIMEOUT_MS;
 
     function updateActivity() {
-        localStorage.setItem('scriptEngineLastActivity', Date.now().toString());
+        localStorage.setItem('lastActivity', Date.now().toString());
     }
 
     function checkInactivity() {
-        const last = parseInt(localStorage.getItem('scriptEngineLastActivity') || '0');
+        const last = parseInt(localStorage.getItem('lastActivity') || '0');
         if (Date.now() - last > LIMIT) {
-            isLoggingOut = true;
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'login.html';
-            });
+            forceLogout('Sesi berakhir karena tidak ada aktivitas selama 12 jam.');
         }
     }
 
@@ -1054,7 +1152,6 @@ function startInactivityTimer() {
         document.addEventListener(evt, updateActivity, { passive: true });
     });
 
-    // TAMBAHAN: Cek saat tab kembali aktif (browser pause timer di background tab)
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
             checkInactivity();
@@ -1063,7 +1160,7 @@ function startInactivityTimer() {
 
     updateActivity();
     setInterval(checkInactivity, 60000);
-    checkInactivity(); // Cek sekali saat pertama kali load
+    checkInactivity();
 }
 
 
@@ -2638,31 +2735,30 @@ async function executeChangePassword() {
         await user.reauthenticateWithCredential(credential);
         await user.updatePassword(newPass);
         
-        // KICK semua session lain kecuali yang sekarang
-        try {
-            const db = firebase.firestore();
-            const deviceId = getOrCreateDeviceId();
-            const mySessionId = `${user.uid}_${deviceId}`;
-            
-            const snapshot = await db.collection('sessions')
-                .where('uid', '==', user.uid)
-                .get();
-            
-            // Gunakan batch write untuk efisien
-            if (!snapshot.empty) {
-                const batch = db.batch();
-                snapshot.docs.forEach(doc => {
-                    if (doc.id !== mySessionId) {
-                        batch.delete(doc.ref);
-                    }
-                });
-                await batch.commit();
-                console.log('[Session] Kicked all other devices after password change.');
-            }
-        } catch (sessionErr) {
-            // Jangan gagalkan proses ganti password kalau kick session gagal
-            console.warn('[Session] Gagal kick sesi lain:', sessionErr.message);
-        }
+    // KICK semua session lain karena password berubah
+    try {
+        const db = firebase.firestore();
+        const snapshot = await db.collection('sessions')
+            .where('uid', '==', user.uid)
+            .where('isActive', '==', true)
+            .get();
+        
+        const batch = db.batch();
+        snapshot.forEach(function(doc) {
+            batch.update(doc.ref, {
+                isActive: false,
+                invalidatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                invalidationReason: 'Password changed'
+            });
+        });
+        await batch.commit();
+    } catch (sessionErr) {
+        console.warn('[Session] Gagal kick sesi lain:', sessionErr.message);
+    }
+
+    // Buat session baru untuk device ini
+    await createSession(user);
+    startSessionListener(user);
         
         closeChangePasswordModal();
         showToast('success', 'Password Berhasil Diubah', 'Password akun kamu sudah diperbarui. Semua perangkat lain telah logout otomatis.');
@@ -2710,34 +2806,65 @@ function closeLogoutModal(e) {
 }
 
 async function executeLogout() {
-    isLoggingOut = true;
-
-    if (sessionUnsubscribe) {
-        sessionUnsubscribe();
-        sessionUnsubscribe = null;
-    }
-
+    stopSessionListener();
+    await clearCurrentSession();
+    
     try {
-        const user = firebase.auth().currentUser;
-        if (user && typeof firebase.firestore === 'function') {
-            const db = firebase.firestore();
-            const deviceId = getOrCreateDeviceId();
-            db.collection('sessions').doc(`${user.uid}_${deviceId}`).delete().catch(function(){});
-        }
         await firebase.auth().signOut();
     } catch (e) {
         // Abaikan error, tetap redirect
     }
-
+    
     window.location.href = 'login.html';
 }
 
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async function(user) {
     if (!user) {
         window.location.href = 'login.html';
-    } else {
-        initializeApp();
+        return;
     }
+    
+    // 1. CEK WHITELIST: Apakah user ada di Firestore?
+    const hasAccess = await checkAccess(user);
+    if (!hasAccess) return;
+    
+    // 2. CEK: Apakah sudah ada session di localStorage?
+    const sessionId = localStorage.getItem('sessionId');
+    
+    if (!sessionId) {
+        // BELUM ADA SESSION → Login pertama kali / setelah logout
+        // Buat session baru, lalu langsung masuk app
+        await createSession(user);
+        startSessionListener(user);
+        initializeApp();
+        return;
+    }
+    
+    // 3. VALIDASI SESSION YANG SUDAH ADA
+    const sessionResult = await validateSession(user);
+    
+    if (!sessionResult.valid) {
+        // Session invalid -> bersihkan dan lempar ke login
+        await clearCurrentSession();
+        await firebase.auth().signOut();
+        
+        let msg = 'Sesi tidak valid. Silakan login kembali.';
+        if (sessionResult.reason === 'logged_elsewhere') {
+            msg = 'Akun login di perangkat lain. Maksimal 2 device diperbolehkan.';
+        } else if (sessionResult.reason === 'timeout') {
+            msg = 'Sesi berakhir karena tidak ada aktivitas selama 12 jam.';
+        }
+        
+        alert(msg);
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // 4. MULAI REAL-TIME LISTENER (untuk auto-kick)
+    startSessionListener(user);
+    
+    // 5. INITIALIZE APP
+    initializeApp();
 });
 
 // ========================================
@@ -2768,7 +2895,6 @@ function initializeApp() {
 
     initProgressBar();
     startInactivityTimer();
-    manageSession();
 }
 
 // ========================================
