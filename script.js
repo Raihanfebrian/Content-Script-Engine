@@ -1067,16 +1067,119 @@ function stopSessionListener() {
     }
 }
 
+// ========================================
+// KICK DEVICE NOTIFICATION
+// ========================================
+let kickCountdownInterval = null;
+
+function showKickModal(reason, deviceInfo) {
+    const modal = document.getElementById('kickModal');
+    const reasonEl = document.getElementById('kickReason');
+    const deviceBox = document.getElementById('kickDeviceInfo');
+    const deviceText = document.getElementById('kickDeviceText');
+    const secondsEl = document.getElementById('kickSeconds');
+    const progressEl = document.getElementById('kickCountdownProgress');
+    
+    // Set reason text
+    reasonEl.textContent = reason || 'Akun Anda login di perangkat lain. Maksimal 2 device diperbolehkan.';
+    
+    // Set device info if available
+    if (deviceInfo) {
+        deviceBox.classList.remove('hidden');
+        deviceText.textContent = deviceInfo;
+    } else {
+        deviceBox.classList.add('hidden');
+    }
+    
+    // Reset countdown
+    let seconds = 6;
+    secondsEl.textContent = seconds;
+    progressEl.style.transition = 'none';
+    progressEl.style.width = '100%';
+    
+    // Show modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Clear existing interval
+    if (kickCountdownInterval) clearInterval(kickCountdownInterval);
+    
+    // Start countdown after small delay for animation
+    setTimeout(function() {
+        progressEl.style.transition = 'width 1s linear';
+        
+        kickCountdownInterval = setInterval(function() {
+            seconds--;
+            secondsEl.textContent = seconds;
+            progressEl.style.width = ((seconds / 6) * 100) + '%';
+            
+            if (seconds <= 0) {
+                clearInterval(kickCountdownInterval);
+                kickGoToLogin();
+            }
+        }, 1000);
+    }, 50);
+}
+
+function kickGoToLogin() {
+    if (kickCountdownInterval) {
+        clearInterval(kickCountdownInterval);
+        kickCountdownInterval = null;
+    }
+    window.location.href = 'login.html';
+}
+
 function forceLogout(reason) {
     stopSessionListener();
     
-    firebase.auth().signOut().then(function() {
-        localStorage.removeItem('sessionId');
-        localStorage.removeItem('lastActivity');
-        alert(reason);
-        window.location.href = 'login.html';
-    }).catch(function() {
-        window.location.href = 'login.html';
+    // Coba ambil info device yang nge-kick sebelum session di-clear
+    const sessionId = localStorage.getItem('sessionId');
+    let deviceInfo = null;
+    
+    if (sessionId) {
+        const db = firebase.firestore();
+        db.collection('sessions').doc(sessionId).get().then(function(doc) {
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.invalidationReason) {
+                    // Override reason kalau ada dari server
+                    if (data.invalidationReason === 'Password changed') {
+                        reason = 'Password telah diubah dari perangkat lain. Silakan login kembali.';
+                    }
+                }
+                // Ambil device info dari session yang meng-kick (kalau ada)
+                // Cari session lain yang masih aktif untuk tampilkan device info-nya
+                db.collection('sessions')
+                    .where('uid', '==', doc.data().uid)
+                    .where('isActive', '==', true)
+                    .limit(1)
+                    .get().then(function(snap) {
+                        if (!snap.empty) {
+                            const otherSession = snap.docs[0].data();
+                            if (otherSession.deviceInfo) {
+                                deviceInfo = otherSession.deviceInfo;
+                            }
+                        }
+                        showKickModal(reason, deviceInfo);
+                    }).catch(function() {
+                        showKickModal(reason, null);
+                    });
+            } else {
+                showKickModal(reason, null);
+            }
+        }).catch(function() {
+            showKickModal(reason, null);
+        });
+    } else {
+        showKickModal(reason, null);
+    }
+    
+    // Bersihkan session dan sign out
+    localStorage.removeItem('sessionId');
+    localStorage.removeItem('lastActivity');
+    
+    firebase.auth().signOut().catch(function() {
+        // Abaikan error, tetap redirect via countdown
     });
 }
 
