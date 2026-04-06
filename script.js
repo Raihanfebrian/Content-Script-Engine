@@ -2071,6 +2071,8 @@ function executeReset() {
 // ========================================
 // LOGIC: UPDATE PREVIEW (HANYA DIPANGGIL SAAT GENERATE)
 // ========================================
+const PROMPT_CHAR_LIMIT = 5900; // Batas aman sebelum ChatGPT URL error
+
 function updatePreview() {
     const container = document.getElementById('previewContainer');
     
@@ -2083,6 +2085,39 @@ function updatePreview() {
     // Generate teks prompt
     const promptText = generatePrompt();
 
+    // Cek apakah prompt melebihi batas aman
+    const isTooLong = promptText.length > PROMPT_CHAR_LIMIT;
+    const charCount = promptText.length;
+
+    // Tentukan isi footer action berdasarkan panjang prompt
+    const footerActionHtml = isTooLong
+        ? `
+            <!-- Banner Warning Prompt Terlalu Panjang -->
+            <div style="margin: 0 0 12px 0; padding: 12px 16px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 12px; display: flex; align-items: flex-start; gap: 10px;">
+                <svg style="width:18px;height:18px;color:#D97706;flex-shrink:0;margin-top:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>
+                    <p style="font-size:13px;font-weight:700;color:#92400E;margin:0 0 2px 0;">Prompt Terlalu Panjang (${charCount.toLocaleString('id-ID')} karakter)</p>
+                    <p style="font-size:12px;color:#B45309;margin:0;line-height:1.5;">Prompt melebihi batas aman ${PROMPT_CHAR_LIMIT.toLocaleString('id-ID')} karakter. Klik tombol di bawah untuk salin prompt, lalu <strong>paste manual (Ctrl+V)</strong> di ChatGPT.</p>
+                </div>
+            </div>
+            <button onclick="openChatGPTManual()" class="generate-btn-main" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                Salin & Buka ChatGPT
+            </button>
+        `
+        : `
+            <button onclick="openChatGPT()" class="generate-btn-main">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Buat Script Konten Sekarang
+            </button>
+        `;
+
     // Tampilan Mac Window
     const html = `
         <div class="mac-window">
@@ -2093,12 +2128,15 @@ function updatePreview() {
                     <div class="mac-dot dot-yellow"></div>
                     <div class="mac-dot dot-green"></div>
                 </div>
-                <button onclick="copyPrompt()" class="copy-btn-top">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                    </svg>
-                    <span>Salin Prompt</span>
-                </button>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    ${isTooLong ? `<span style="font-size:11px;font-weight:600;color:#D97706;background:#FEF3C7;padding:2px 8px;border-radius:99px;">⚠️ ${charCount.toLocaleString('id-ID')} karakter</span>` : `<span style="font-size:11px;color:#94A3B8;">${charCount.toLocaleString('id-ID')} karakter</span>`}
+                    <button onclick="copyPrompt()" class="copy-btn-top">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Salin Prompt</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Body Prompt -->
@@ -2108,12 +2146,7 @@ function updatePreview() {
 
             <!-- Footer Action -->
             <div class="action-btn-container">
-                <button onclick="openChatGPT()" class="generate-btn-main">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                    Buat Script Konten Sekarang
-                </button>
+                ${footerActionHtml}
             </div>
         </div>
     `;
@@ -2123,7 +2156,7 @@ function updatePreview() {
     // Jalankan animasi mengetik
     const promptArea = document.getElementById('prompt-text-area');
     if(promptArea) {
-        typeWriter(promptText, promptArea, 0); // 0ms delay, chunk 5 karakter (super cepat)
+        typeWriter(promptText, promptArea, 0);
     }
 }
 
@@ -2174,21 +2207,31 @@ function typeWriter(text, element, delay = 1) {
 function openChatGPT() {
     const promptText = generatePrompt();
     
-    // 1. Salin ke clipboard
     navigator.clipboard.writeText(promptText).then(() => {
-        // 2. Buka ChatGPT di tab baru
-        // Menggunakan parameter ?q= untuk auto-fill di beberapa versi web
-        // Jika tidak support, user cukup paste (Ctrl+V)
-        const encodedPrompt = encodeURIComponent(promptText);
-        const chatGPTUrl = `https://chatgpt.com/?q=${encodedPrompt}`; 
-        
-        window.open(chatGPTUrl, '_blank');
-        
-        // Feedback user
-        showToast('success', 'Prompt Tersalin', 'Kamu akan diarahkan ke ChatGPT. Paste (Ctrl+V) jika tidak muncul otomatis.');
+        window.open('https://chatgpt.com/', '_blank');
+        showToast('success', 'Prompt Tersalin! ✅', 'ChatGPT sudah dibuka. Klik kolom chat lalu tekan Ctrl+V (atau Cmd+V di Mac) untuk paste.');
     }).catch(err => {
         console.error('Gagal menyalin: ', err);
-        alert("Gagal menyalin prompt. Silakan salin manual.");
+        alert("Gagal menyalin prompt. Silakan klik tombol 'Salin Prompt' di header preview, lalu paste manual di ChatGPT.");
+    });
+}
+
+// ========================================
+// HELPER: BUKA CHATGPT MANUAL (PROMPT TERLALU PANJANG)
+// ========================================
+function openChatGPTManual() {
+    const promptText = generatePrompt();
+    
+    // 1. Salin ke clipboard
+    navigator.clipboard.writeText(promptText).then(() => {
+        // 2. Buka ChatGPT di tab baru TANPA parameter ?q= (karena prompt terlalu panjang)
+        window.open('https://chatgpt.com/', '_blank');
+        
+        // 3. Feedback instruksi paste manual
+        showToast('info', 'Prompt Tersalin! ✂️', 'ChatGPT sudah dibuka. Klik kolom chat lalu tekan Ctrl+V (atau Cmd+V di Mac) untuk paste prompt.');
+    }).catch(err => {
+        console.error('Gagal menyalin: ', err);
+        alert("Gagal menyalin prompt otomatis. Silakan klik tombol 'Salin Prompt' di header preview, lalu paste manual di ChatGPT.");
     });
 }
 
