@@ -862,7 +862,123 @@ function clearStateStorage() {
     localStorage.removeItem('scriptEngineState');
 }
 
+// ========================================
+// PROMPT HISTORY (5 TERAKHIR)
+// ========================================
+function savePromptToHistory(promptText) {
+    try {
+        const history = getPromptHistory();
+        const entry = {
+            id: Date.now(),
+            timestamp: new Date().toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }),
+            filter: appState.masterFilter,
+            label: appState.masterFilter === 'jualan'
+                ? (appState.namaProduk || 'Produk')
+                : (appState.topikUtama || appState.kategoriNiche || 'Edukasi'),
+            platform: (appState.platform || '').split(' ')[0],
+            text: promptText
+        };
+        history.unshift(entry);
+        const trimmed = history.slice(0, 5); // Simpan max 5
+        localStorage.setItem('promptHistory', JSON.stringify(trimmed));
+    } catch(e) {}
+}
 
+function getPromptHistory() {
+    try {
+        const h = localStorage.getItem('promptHistory');
+        return h ? JSON.parse(h) : [];
+    } catch(e) { return []; }
+}
+
+function openHistoryModal() {
+    const history = getPromptHistory();
+    const modal = document.getElementById('historyModal');
+    const content = document.getElementById('historyContent');
+
+    if (history.length === 0) {
+        content.innerHTML = `<p style="text-align:center;color:#94A3B8;padding:40px 0;font-size:14px;">Belum ada riwayat prompt.<br>Generate script dulu yuk!</p>`;
+    } else {
+        content.innerHTML = history.map((entry, idx) => `
+            <div style="border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;" 
+                 onmouseover="this.style.borderColor='#10B981';this.style.background='#F0FDF4'" 
+                 onmouseout="this.style.borderColor='#E2E8F0';this.style.background='white'"
+                 onclick="loadHistoryEntry(${idx})">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <span style="font-size:13px;font-weight:700;color:#0F172A;">${entry.label}</span>
+                    <span style="font-size:11px;color:#94A3B8;">${entry.timestamp}</span>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <span style="font-size:11px;padding:2px 8px;background:${entry.filter === 'jualan' ? '#D1FAE5' : '#DBEAFE'};color:${entry.filter === 'jualan' ? '#065F46' : '#1E40AF'};border-radius:99px;font-weight:600;">${entry.filter === 'jualan' ? '🛒 Jualan' : '💡 Edukasi'}</span>
+                    <span style="font-size:11px;padding:2px 8px;background:#F1F5F9;color:#475569;border-radius:99px;">${entry.platform}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHistoryModal(e) {
+    // Guard hanya untuk klik overlay — skip kalau dipanggil dari tombol X atau JS langsung
+    if (e && e.currentTarget && e.currentTarget.id === 'historyModal' && e.target !== e.currentTarget) return;
+    document.getElementById('historyModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function loadHistoryEntry(idx) {
+    const history = getPromptHistory();
+    const entry = history[idx];
+    if (!entry) return;
+
+    // Tampilkan prompt di preview
+    const container = document.getElementById('previewContainer');
+    const promptText = entry.text;
+    const charCount = promptText.length;
+    const isTooLong = charCount > PROMPT_CHAR_LIMIT;
+
+    const footerActionHtml = isTooLong
+        ? `<button onclick="openChatGPTManual()" class="generate-btn-main" style="background:linear-gradient(135deg,#F59E0B,#D97706);">Salin & Buka ChatGPT</button>`
+        : `<button onclick="openChatGPTFromHistory('${entry.id}')" class="generate-btn-main">Buat Script Konten Sekarang</button>`;
+
+    container.innerHTML = `
+        <div class="mac-window">
+            <div style="padding:8px 16px;background:#EFF6FF;border-bottom:1px solid #BFDBFE;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12px;font-weight:600;color:#1E40AF;">📂 Riwayat: ${entry.label}</span>
+                <span style="font-size:11px;color:#94A3B8;">${entry.timestamp}</span>
+            </div>
+            <div class="mac-header">
+                <div class="mac-dots">
+                    <div class="mac-dot dot-red"></div>
+                    <div class="mac-dot dot-yellow"></div>
+                    <div class="mac-dot dot-green"></div>
+                </div>
+                <span style="font-size:11px;color:#94A3B8;">${charCount.toLocaleString('id-ID')} karakter</span>
+            </div>
+            <div class="prompt-body-container">
+                <div id="prompt-text-area" class="prompt-text-content"></div>
+            </div>
+            <div class="action-btn-container">${footerActionHtml}</div>
+        </div>
+    `;
+
+    const promptArea = document.getElementById('prompt-text-area');
+    if (promptArea) typeWriter(promptText, promptArea, 0);
+
+    closeHistoryModal({});
+}
+
+// Simpan teks prompt ke history saat text fix dipakai
+function openChatGPTFromHistory(id) {
+    const history = getPromptHistory();
+    const entry = history.find(h => h.id === parseInt(id));
+    if (!entry) return;
+    navigator.clipboard.writeText(entry.text).then(() => {
+        window.open('https://chatgpt.com/', '_blank');
+        showToast('success', 'Prompt Tersalin! ✅', 'ChatGPT sudah dibuka. Tekan Ctrl+V untuk paste.');
+    });
+}
 
 // ========================================
 // RESTORE INPUT VALUES (SETELAH RENDER DOM)
@@ -1724,6 +1840,42 @@ function createInputField(id, label, placeholder, tooltipText = '', isRequired =
     `;
 }
 
+// Map rekomendasi panjang per field
+const TEXTAREA_MIN_CHARS = {
+    painPoint:      100,
+    solusiUtama:    100,
+    uniqueValue:    80,
+    referensiMateri: 200,
+    bahanMateri:    200,
+    keresahan:      80,
+    insightUtama:   80,
+    sudutPandang:   80,
+};
+
+function getCharCounterHtml(id) {
+    const min = TEXTAREA_MIN_CHARS[id];
+    if (!min) return '';
+    return `<span id="counter-${id}" style="font-size:11px;color:#94A3B8;font-weight:500;">0 / min. ${min} karakter</span>`;
+}
+
+function updateCharCounter(id, value) {
+    const counter = document.getElementById(`counter-${id}`);
+    if (!counter) return;
+    const min = TEXTAREA_MIN_CHARS[id];
+    if (!min) return;
+    const len = value.length;
+    if (len === 0) {
+        counter.style.color = '#94A3B8';
+        counter.textContent = `0 / min. ${min} karakter`;
+    } else if (len < min) {
+        counter.style.color = '#F59E0B';
+        counter.textContent = `${len} / min. ${min} karakter ⚠️`;
+    } else {
+        counter.style.color = '#10B981';
+        counter.textContent = `${len} karakter ✓`;
+    }
+}
+
 function createTextArea(id, label, placeholder, tooltipText = '', isRequired = false) {
     const requiredMark = isRequired ? '<span class="text-red-500 ml-1">*</span>' : '';
     const tooltipHtml = tooltipText ? `
@@ -1742,11 +1894,14 @@ function createTextArea(id, label, placeholder, tooltipText = '', isRequired = f
 
     return `
         <div class="form-group md:col-span-2">
-            <label class="form-label">
-                ${label}${requiredMark}
-                ${tooltipHtml}
+            <label class="form-label" style="justify-content:space-between;">
+                <span style="display:flex;align-items:center;gap:8px;">
+                    ${label}${requiredMark}
+                    ${tooltipHtml}
+                </span>
+                ${getCharCounterHtml(id)}
             </label>
-            <textarea id="input-${id}" class="input-text-field" placeholder="${placeholder}" oninput="handleTextInput('${id}', this.value)"></textarea>
+            <textarea id="input-${id}" class="input-text-field" placeholder="${placeholder}" oninput="handleTextInput('${id}', this.value); updateCharCounter('${id}', this.value)"></textarea>
         </div>
     `;
 }
@@ -2013,6 +2168,91 @@ function renderSection6() {
 }
 
 // ========================================
+// TEMPLATE STARTER / CONTOH ISIAN
+// ========================================
+const TEMPLATE_EXAMPLES = {
+    jualan: {
+        goal: 'Sales / Closing (Langsung jualan / hard selling)',
+        platform: 'TikTok / IG Reels / YT Shorts (Video vertikal cepat & visual)',
+        role: 'Advertiser / Business Owner (Pemilik bisnis langsung)',
+        persona: 'UGC Creator (Sok akrab, gaya racun sosmed, natural)',
+        jenisKonten: 'Soft Selling / Edu-Selling',
+        formatDurasi: 'Video Medium (30–60 detik)',
+        gayaVisual: 'Talking Head (Wajah Full)',
+        framework: 'PAS (Senggol Masalah & Solusi)',
+        hook: 'Senggol Pain Point / Fear',
+        levelAwareness: 'Problem Aware',
+        psychographics: 'Insecure / Glow-Up Seeker',
+        targetMarket: 'Beauty & Fashion Enthusiast',
+        compliance: 'Beauty / Skincare (Soft Claim)',
+        namaProduk: 'Serum Glowing Vitamin C Pro',
+        jenisProduk: 'Skincare/Beauty',
+        painPoint: 'Kulit kusam dan tidak merata meski sudah rutin skincare. Udah coba banyak produk tapi hasilnya nihil, malah iritasi.',
+        solusiUtama: 'Cerahkan kulit secara bertahap dalam 14 hari dengan formula Vitamin C 15% + Niacinamide yang udah BPOM certified.',
+        uniqueValue: 'Satu-satunya serum lokal yang pakai stable Vitamin C Ethyl Ascorbic Acid 15% — bukan ascorbic acid biasa yang gampang oksidasi.',
+        hargaPromo: 'Normal Rp189.000, promo hari ini Rp129.000 (hemat 32%)',
+        asetVisual: 'Punya fisik produk, before-after foto klien, dan konten unboxing',
+        ctaJualan: 'Cek Keranjang Kuning',
+        targetKeyword: 'serum vitamin c terbaik, serum glowing BPOM',
+        gayaBahasa: 'Gen-Z / Anak Jaksel (Gaul)',
+        jumlahVariasi: '1 Script (Fokus & Presisi)'
+    },
+    edukasi: {
+        goal: 'Edukasi / Value Delivery (Berikan informasi berbobot / \'daging\')',
+        platform: 'TikTok / IG Reels / YT Shorts (Edukasi fast-paced, tips singkat)',
+        role: 'Content Creator / Influencer (Kreator independen)',
+        persona: 'The Educator (Formal, terstruktur, langsung ke poin materi)',
+        jenisKonten: 'Listicle / Top X (Misal: 3 Cara, 5 Tools)',
+        formatDurasi: 'Video Medium (30–60 detik)',
+        gayaVisual: 'Talking Head (Wajah Full)',
+        framework: 'PCS (Problem, Cause, Solution)',
+        hook: 'Curiosity Gap / Bongkar Rahasia',
+        levelAwareness: 'Problem Aware',
+        psychographics: 'Time-Starved / Sibuk',
+        targetMarket: 'Karyawan Swasta / Budak Korporat',
+        compliance: 'General / Aman Bebas',
+        kategoriNiche: 'Self-Development & Motivasi',
+        topikUtama: '3 kebiasaan pagi yang bikin produktivitas naik 2x lipat',
+        keresahan: 'Kerja dari pagi sampai malem tapi ngerasa nggak ada yang selesai, exhausted tapi output minim',
+        insightUtama: 'Produktivitas bukan soal kerja lebih lama, tapi soal mengelola energi, bukan waktu',
+        sudutPandang: 'To-do list justru sering bikin kita lebih tidak produktif karena kita cenderung ngerjain yang gampang dulu bukan yang penting',
+        ctaEdukasi: 'Follow & Save',
+        targetKeyword: 'tips produktivitas, cara kerja lebih efektif',
+        gayaBahasa: 'Santai & Relatable (Sok kenal)',
+        jumlahVariasi: '1 Script (Fokus & Presisi)'
+    }
+};
+
+function loadTemplate(type) {
+    const template = TEMPLATE_EXAMPLES[type];
+    if (!template) return;
+
+    // Set master filter dulu
+    selectMasterFilter(type);
+
+    // Isi semua state dari template
+    Object.assign(appState, template);
+
+    // Restore semua nilai ke DOM setelah render selesai
+    setTimeout(() => {
+        restoreInputValues();
+        // Restore textarea fields yang tidak ditangani restoreInputValues
+        const textareaFields = ['painPoint', 'solusiUtama', 'uniqueValue', 'referensiMateri',
+                                'keresahan', 'insightUtama', 'sudutPandang', 'bahanMateri'];
+        textareaFields.forEach(field => {
+            const el = document.getElementById(`input-${field}`);
+            if (el && appState[field]) {
+                el.value = appState[field];
+                updateCharCounter(field, appState[field]);
+            }
+        });
+        saveStateToStorage();
+        updateProgressBar();
+        showToast('success', 'Contoh Isian Dimuat! 🎉', 'Semua field sudah terisi dengan contoh. Kamu bisa langsung klik Generate Script atau edit sesuai kebutuhan.');
+    }, 300);
+}
+
+// ========================================
 // LOGIC: RESET FORM
 // ========================================
 function resetForm() {
@@ -2118,9 +2358,23 @@ function updatePreview() {
             </button>
         `;
 
+    // Hitung quality score
+    const quality = calculateQualityScore();
+    const qColor = getScoreColor(quality.score);
+
     // Tampilan Mac Window
     const html = `
         <div class="mac-window">
+            <!-- Quality Score Banner -->
+            <div style="padding:8px 16px;background:${qColor.bg};border-bottom:1px solid ${qColor.border};display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:12px;font-weight:600;color:${qColor.text};">Prompt Quality: ${qColor.label}</span>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <div style="width:80px;height:6px;background:rgba(0,0,0,0.1);border-radius:99px;overflow:hidden;">
+                        <div style="width:${quality.score}%;height:100%;background:${qColor.text};border-radius:99px;transition:width 0.5s ease;"></div>
+                    </div>
+                    <span style="font-size:12px;font-weight:700;color:${qColor.text};">${quality.score}%</span>
+                </div>
+            </div>
             <!-- Header Mac Style -->
             <div class="mac-header">
                 <div class="mac-dots">
@@ -2152,7 +2406,8 @@ function updatePreview() {
     `;
 
     container.innerHTML = html;
-    
+    // Simpan ke history setiap kali generate berhasil
+    savePromptToHistory(promptText);
     // Jalankan animasi mengetik
     const promptArea = document.getElementById('prompt-text-area');
     if(promptArea) {
@@ -2163,39 +2418,45 @@ function updatePreview() {
 // ========================================
 // HELPER: ANIMASI MENGETIK (TYPEWRITER) + AUTO SCROLL
 // ========================================
-function typeWriter(text, element, delay = 1) {
+function typeWriter(text, element, delay = 1, onComplete = null) {
     let i = 0;
-    element.innerHTML = ''; // Clear previous content
+    element.innerHTML = '';
     
-    // Tambah cursor awal
     const cursor = document.createElement('span');
     cursor.className = 'cursor-blink';
     element.appendChild(cursor);
 
-    // Dapatkan container parent untuk Scroll
     const scrollContainer = element.closest('.prompt-body-container');
-    
-    // KONFIGURASI KECEPATAN: 5 karakter per putaran (5x lebih cepat)
-    const chunkSize = 5; 
+    const chunkSize = 5;
+
+    // Disable tombol action selama typewriter jalan
+    const actionBtn = document.querySelector('.generate-btn-main');
+    if (actionBtn) {
+        actionBtn.disabled = true;
+        actionBtn.style.opacity = '0.6';
+        actionBtn.style.cursor = 'not-allowed';
+    }
 
     function type() {
         if (i < text.length) {
-            // Ambil potongan teks (chunk) sesuai ukuran
             const end = Math.min(i + chunkSize, text.length);
             const chunk = document.createTextNode(text.slice(i, end));
-            
-            // Sisipkan chunk sebelum cursor
             element.insertBefore(chunk, cursor);
-            
-            // Update index
             i = end;
-            
-            // Auto scroll ke bawah mengikuti teks baru
             if (scrollContainer) {
                 scrollContainer.scrollTop = scrollContainer.scrollHeight;
             }
-            
             setTimeout(type, delay);
+        } else {
+            // Typewriter selesai — hapus cursor, aktifkan tombol kembali
+            cursor.remove();
+            const btn = document.querySelector('.generate-btn-main');
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
+            if (onComplete) onComplete();
         }
     }
     type();
@@ -2238,6 +2499,13 @@ function openChatGPTManual() {
 // ========================================
 // GENERATE SCRIPT HANDLER (FINAL)
 // ========================================
+// Helper: cek apakah field "Lainnya" sudah diisi manual
+function isManualFieldEmpty(fieldId) {
+    const val = appState[fieldId] || '';
+    // Dianggap kosong kalau value masih mengandung kata "lainnya/manual" atau benar-benar kosong
+    return val.trim() === '' || val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual');
+}
+
 function generateScript() {
     const platformCheck = validatePlatformDuration();
     if (!platformCheck.valid) {
@@ -2245,14 +2513,44 @@ function generateScript() {
         return;
     }
 
+    // Validasi field "Lainnya" di section 1
+    const s1ManualFields = ['goal', 'platform', 'role', 'persona'];
+    for (const f of s1ManualFields) {
+        const val = appState[f] || '';
+        if (val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual')) {
+            showToast('error', 'Section 1 Belum Lengkap', `Kamu memilih "Lainnya" tapi belum mengisi detailnya. Mohon isi field manual yang tersedia.`);
+            return;
+        }
+    }
+
     if (!appState.jenisKonten || !appState.formatDurasi || !appState.gayaVisual) {
         showToast('error', 'Section 2 Belum Lengkap', 'Lengkapi Jenis Konten, Format & Durasi, dan Gaya Visual terlebih dahulu.');
         return;
     }
 
+    // Validasi field "Lainnya" di section 2
+    const s2ManualFields = ['jenisKonten', 'formatDurasi', 'gayaVisual'];
+    for (const f of s2ManualFields) {
+        const val = appState[f] || '';
+        if (val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual')) {
+            showToast('error', 'Section 2 Belum Lengkap', `Kamu memilih "Lainnya" tapi belum mengisi detailnya. Mohon isi field manual yang tersedia.`);
+            return;
+        }
+    }
+
     if (!appState.framework || !appState.hook) {
         showToast('error', 'Section 3 Belum Lengkap', 'Pilih Framework Copywriting dan Hook Strategy terlebih dahulu.');
         return;
+    }
+
+    // Validasi "Lainnya" section 3
+    const s3ManualFields = ['framework', 'hook'];
+    for (const f of s3ManualFields) {
+        const val = appState[f] || '';
+        if (val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual')) {
+            showToast('error', 'Section 3 Belum Lengkap', `Kamu memilih "Lainnya" tapi belum mengisi detailnya. Mohon isi field manual yang tersedia.`);
+            return;
+        }
     }
 
     if (!appState.levelAwareness || !appState.psychographics || !appState.targetMarket || !appState.compliance) {
@@ -2265,10 +2563,28 @@ function generateScript() {
             showToast('error', 'Section 5 Belum Lengkap', 'Lengkapi semua field wajib di Detail Produk (Nama, Jenis, Pain Point, Solusi, USP, CTA, Gaya Bahasa).');
             return;
         }
+        // Validasi "Lainnya" section 5 jualan
+        const s5JualanManual = ['jenisProduk', 'ctaJualan', 'gayaBahasa'];
+        for (const f of s5JualanManual) {
+            const val = appState[f] || '';
+            if (val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual')) {
+                showToast('error', 'Section 5 Belum Lengkap', `Kamu memilih "Lainnya" tapi belum mengisi detailnya. Mohon isi field manual yang tersedia.`);
+                return;
+            }
+        }
     } else {
         if (!appState.kategoriNiche || !appState.ctaEdukasi || !appState.gayaBahasa) {
             showToast('error', 'Section 5 Belum Lengkap', 'Pilih Kategori Niche, Call to Action, dan Gaya Bahasa terlebih dahulu.');
             return;
+        }
+        // Validasi "Lainnya" section 5 edukasi
+        const s5EdukasiManual = ['kategoriNiche', 'ctaEdukasi', 'gayaBahasa'];
+        for (const f of s5EdukasiManual) {
+            const val = appState[f] || '';
+            if (val.toLowerCase().includes('lainnya') || val.toLowerCase().includes('manual')) {
+                showToast('error', 'Section 5 Belum Lengkap', `Kamu memilih "Lainnya" tapi belum mengisi detailnya. Mohon isi field manual yang tersedia.`);
+                return;
+            }
         }
     }
 
@@ -2278,6 +2594,14 @@ function generateScript() {
     }
 
     updatePreview();
+
+    // Auto-scroll ke preview (terutama berguna di mobile)
+    setTimeout(() => {
+        const previewContainer = document.getElementById('previewContainer');
+        if (previewContainer) {
+            previewContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
 }
 
 // ========================================
@@ -2654,6 +2978,107 @@ function copyPrompt() {
 }
 
 // ========================================
+// DOWNLOAD PROMPT SEBAGAI .TXT
+// ========================================
+function downloadPrompt() {
+    const promptText = generatePrompt();
+    const label = appState.masterFilter === 'jualan'
+        ? (appState.namaProduk || 'prompt-jualan')
+        : (appState.topikUtama || appState.kategoriNiche || 'prompt-edukasi');
+    const filename = `ScriptEngine_${label.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 30)}_${Date.now()}.txt`;
+
+    const blob = new Blob([promptText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('success', 'Prompt Diunduh! 📄', `File "${filename}" berhasil disimpan.`);
+}
+
+// ========================================
+// PROMPT QUALITY SCORE
+// ========================================
+function calculateQualityScore() {
+    const s = appState;
+    const isJualan = s.masterFilter === 'jualan';
+    let score = 0;
+    let maxScore = 0;
+
+    // Helper hitung poin
+    const add = (condition, points) => {
+        maxScore += points;
+        if (condition) score += points;
+    };
+
+    // === SECTION 1 (20 poin) ===
+    add(!!s.goal, 4);
+    add(!!s.platform, 4);
+    add(!!s.role, 4);
+    add(!!s.persona, 4);
+    add(!!s.masterFilter, 4);
+
+    // === SECTION 2 (15 poin) ===
+    add(!!s.jenisKonten, 5);
+    add(!!s.formatDurasi, 5);
+    add(!!s.gayaVisual, 5);
+
+    // === SECTION 3 (15 poin) ===
+    add(!!s.framework, 8);
+    add(!!s.hook, 7);
+
+    // === SECTION 4 (15 poin) ===
+    add(!!s.levelAwareness, 4);
+    add(!!s.psychographics, 4);
+    add(!!s.targetMarket, 4);
+    add(!!s.compliance, 3);
+
+    // === SECTION 5 (25 poin - terbesar karena paling pengaruh ke kualitas) ===
+    const hasReferensi = isJualan
+        ? (s.referensiMateri || '').length > 200
+        : (s.bahanMateri || '').length > 200;
+
+    if (isJualan) {
+        add(!!s.namaProduk, 3);
+        add(!!s.jenisProduk, 2);
+        // Kalau referensi sudah panjang, Pain Point/Solusi/USP dianggap terwakili
+        add(hasReferensi || (s.painPoint || '').length > 50, 5);
+        add(hasReferensi || (s.solusiUtama || '').length > 50, 5);
+        add(hasReferensi || (s.uniqueValue || '').length > 50, 4);
+        add(!!s.hargaPromo, 2); // opsional tapi nambah skor
+        add(!!s.ctaJualan, 2);
+        add(!!s.gayaBahasa, 2);
+    } else {
+        add(!!s.kategoriNiche, 3);
+        add(!!(s.topikUtama || '').trim(), 4);
+        add(hasReferensi || (s.keresahan || '').length > 50, 4);
+        add(hasReferensi || (s.insightUtama || '').length > 50, 4);
+        add(!!(s.sudutPandang || '').trim(), 3);
+        add(!!s.ctaEdukasi, 2);
+        add(!!s.gayaBahasa, 2);
+        add(!!(s.leadMagnet || '').trim(), 3); // opsional
+    }
+
+    // === BONUS (10 poin) ===
+    add(!!(s.targetKeyword || '').trim(), 5);  // SEO keyword diisi
+    add(!!(isJualan ? s.asetVisual : s.asetVisual), 5); // Aset visual diisi
+
+    const percentage = Math.round((score / maxScore) * 100);
+    return { score: percentage, raw: score, max: maxScore };
+}
+
+function getScoreColor(score) {
+    if (score >= 85) return { bg: '#D1FAE5', border: '#6EE7B7', text: '#065F46', label: 'Sangat Kuat 🔥' };
+    if (score >= 70) return { bg: '#D1FAE5', border: '#A7F3D0', text: '#059669', label: 'Kuat ✅' };
+    if (score >= 50) return { bg: '#FEF3C7', border: '#FDE68A', text: '#92400E', label: 'Cukup ⚠️' };
+    return { bg: '#FEE2E2', border: '#FECACA', text: '#991B1B', label: 'Lemah ❌' };
+}
+
+// ========================================
 // HELPER: TAMPILKAN PLACEHOLDER PREVIEW
 // ========================================
 function showPreviewPlaceholder(container) {
@@ -2743,7 +3168,7 @@ function triggerInfoModal(element) {
 function closeInfoModal(event) {
     const modal = document.getElementById('infoModal');
     modal.classList.remove('active');
-    document.body.style.overflow = 'auto'; 
+    document.body.style.overflow = ''; 
 }
 
 // ========================================

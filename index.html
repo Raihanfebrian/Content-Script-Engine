@@ -35,6 +35,12 @@
                     </svg>
                     <span class="text-sm font-semibold hidden sm:inline">Ganti Password</span>
                 </button>
+                <button onclick="openHistoryModal()" class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-200" title="Riwayat Prompt">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-semibold hidden sm:inline">Riwayat</span>
+                </button>
                 <button onclick="logout()" class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all duration-200" title="Keluar">
                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -144,6 +150,17 @@
                             <h4 class="font-bold text-lg text-slate-900 mb-1">Edukasi / Branding (Tanpa Jualan)</h4>
                             <p class="text-sm text-slate-400">Fokus: engagement, authority, dan trust.</p>
                         </div>
+                    </div>
+
+                    <!-- TEMPLATE STARTER -->
+                    <div class="flex items-center gap-3 mb-8">
+                        <span style="font-size:13px;color:#94A3B8;font-weight:500;white-space:nowrap;">Coba contoh isian:</span>
+                        <button onclick="loadTemplate('jualan')" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#F0FDF4;border:1px solid #A7F3D0;border-radius:99px;font-size:12px;font-weight:700;color:#059669;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#D1FAE5'" onmouseout="this.style.background='#F0FDF4'">
+                            🛒 Contoh Jualan
+                        </button>
+                        <button onclick="loadTemplate('edukasi')" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:99px;font-size:12px;font-weight:700;color:#2563EB;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'">
+                            💡 Contoh Edukasi
+                        </button>
                     </div>
 
                     <!-- CONTAINER DINAMIS 1 -->
@@ -394,6 +411,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Riwayat Prompt -->
+<div id="historyModal" class="info-modal-overlay" onclick="closeHistoryModal(event)">
+    <div class="info-modal-box" onclick="event.stopPropagation()" style="max-width:480px;">
+        <div class="info-modal-header">
+            <div class="info-modal-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Riwayat Prompt (5 Terakhir)</span>
+            </div>
+            <button class="info-modal-close" onclick="closeHistoryModal(event)">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="info-modal-body" id="historyContent"></div>
+    </div>
+</div>
 
 </body>
 </html>
